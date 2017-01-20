@@ -15,10 +15,7 @@ apply plugin: 'maven-publish'
 
 group = 'uk.ac.ebi.tsc.aap.client'
 
-jar {
-    baseName = 'aap-client-java'
-    version =  '0.1.0'
-}
+version = '1.14.20-SNAPSHOT'
 
 repositories {
     maven { url "http://ena-dev:8081/artifactory/all" }
@@ -54,7 +51,11 @@ publishing {
                 username artifactoryUsername
                 password artifactoryPassword
             }
-            url "http://ena-dev:8081/artifactory/libs-release-local"
+            if(project.version.endsWith('-SNAPSHOT')) {
+                url "http://ena-dev:8081/artifactory/libs-snapshot-local"
+            } else {
+                url "http://ena-dev:8081/artifactory/libs-release-local"
+            }
         }
     }
 }
