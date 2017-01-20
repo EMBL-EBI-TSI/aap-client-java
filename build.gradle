@@ -29,3 +29,7 @@ dependencies {
     compile("com.fasterxml.jackson.core:jackson-databind")
     testCompile("junit:junit")
 }
+
+bootRepackage {
+    enabled = false
+}
