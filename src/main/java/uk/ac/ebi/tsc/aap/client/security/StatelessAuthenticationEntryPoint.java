@@ -1,4 +1,4 @@
-package uk.ac.ebi.tsi.aap.client.security;
+package uk.ac.ebi.tsc.aap.client.security;
 
 
 import org.springframework.security.core.AuthenticationException;
