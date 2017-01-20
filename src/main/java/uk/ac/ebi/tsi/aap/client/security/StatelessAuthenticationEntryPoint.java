@@ -10,10 +10,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * Created by ukumbham on 29/09/2016.
+ * Always return Unauthorized (401).
+ *
+ * @author Uppendra Kumbham  <ukumbham@ebi.ac.uk>
+ * @since 29/09/2016.
  */
 @Component
-public class TokenAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class StatelessAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request,
