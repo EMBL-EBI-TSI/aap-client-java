@@ -10,6 +10,9 @@ buildscript {
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'maven-publish'
+
+group = 'uk.ac.ebi.tsc.aap.client'
 
 jar {
     baseName = 'aap-client-java'
@@ -32,4 +35,24 @@ dependencies {
 
 bootRepackage {
     enabled = false
+}
+
+task sourceJar(type: Jar) { from sourceSets.main.allJava }
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifact sourceJar { classifier "sources" }
+        }
+    }
+    repositories {
+        maven {
+            credentials {
+                username artifactoryUsername
+                password artifactoryPassword
+            }
+            url "http://ena-dev:8081/artifactory/libs-release-local"
+        }
+    }
 }
