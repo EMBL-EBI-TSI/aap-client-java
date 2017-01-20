@@ -1,4 +1,4 @@
-package uk.ac.ebi.tsi.aap.client;
+package uk.ac.ebi.tsc.aap.client.model;
 
 
 import org.slf4j.Logger;
