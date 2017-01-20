@@ -1,6 +1,7 @@
 buildscript {
     repositories {
         mavenCentral()
+        maven { url "http://ena-dev:8081/artifactory/all" }
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.3.RELEASE")
@@ -20,6 +21,7 @@ jar {
 }
 
 repositories {
+    maven { url "http://ena-dev:8081/artifactory/all" }
     mavenCentral()
 }
 
