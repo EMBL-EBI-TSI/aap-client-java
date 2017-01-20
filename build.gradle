@@ -15,7 +15,7 @@ apply plugin: 'maven-publish'
 
 group = 'uk.ac.ebi.tsc.aap.client'
 
-version = '1.14.20-SNAPSHOT'
+version = '0.1-SNAPSHOT'
 
 repositories {
     maven { url "http://ena-dev:8081/artifactory/all" }
