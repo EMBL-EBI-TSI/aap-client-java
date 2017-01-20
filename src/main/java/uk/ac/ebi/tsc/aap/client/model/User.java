@@ -3,12 +3,18 @@ package uk.ac.ebi.tsc.aap.client.model;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Data model for an AAP user
  */
-public class User implements Serializable {
+public class User implements Serializable, UserDetails {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(User.class);
     private static final long serialVersionUID = 1L;
@@ -16,6 +22,7 @@ public class User implements Serializable {
     private String userName;
     private String email;
     private String userReference;
+    private List<Domain> domains;
 
     public User(){}
 
@@ -23,6 +30,7 @@ public class User implements Serializable {
         this.userName = userName;
         this.email = email;
         this.userReference = userReference;
+        domains = new ArrayList();
     }
 
     public String getUserName() {
@@ -49,6 +57,14 @@ public class User implements Serializable {
         this.userReference = userReference;
     }
 
+    public List<Domain> getDomains() {
+        return domains;
+    }
+
+    public void setDomains(List<Domain> domains) {
+        this.domains = domains;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -68,5 +84,40 @@ public class User implements Serializable {
         result = 31 * result + (email != null ? email.hashCode() : 0);
         result = 31 * result + (userReference != null ? userReference.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return this.getDomains();
+    }
+
+    @Override
+    public String getPassword() {
+        return null;
+    }
+
+    @Override
+    public String getUsername() {
+        return userName;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

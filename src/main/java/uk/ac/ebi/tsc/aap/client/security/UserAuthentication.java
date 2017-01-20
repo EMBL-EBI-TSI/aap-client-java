@@ -1,0 +1,64 @@
+package uk.ac.ebi.tsc.aap.client.security;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import uk.ac.ebi.tsc.aap.client.model.User;
+
+import java.util.Collection;
+
+/**
+ * Apply custom authentication
+ *
+ * @author Amelie Cornelis  <ameliec@ebi.ac.uk>
+ * @since 18/07/2016.
+ */
+public class UserAuthentication implements Authentication {
+
+    private static final Logger LOGGER = LoggerFactory.
+            getLogger(UserAuthentication.class);
+    private User user;
+    private boolean authenticated = true;
+
+    public UserAuthentication(){ }
+
+    UserAuthentication(final User user) {
+        this.user = user;
+    }
+
+    @Override
+    public String getName() {
+        return user.getUsername();
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return user.getAuthorities();
+    }
+
+    @Override
+    public Object getCredentials() {
+        return user.getPassword();
+    }
+
+    @Override
+    public User getDetails() {
+        return user;
+    }
+
+    @Override
+    public Object getPrincipal() {
+        return user.getUsername();
+    }
+
+    @Override
+    public boolean isAuthenticated() {
+        return authenticated;
+    }
+
+    @Override
+    public void setAuthenticated(boolean authenticated) {
+        this.authenticated = authenticated;
+    }
+}

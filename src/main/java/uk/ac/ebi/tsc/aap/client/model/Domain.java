@@ -3,6 +3,8 @@ package uk.ac.ebi.tsc.aap.client.model;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.GrantedAuthority;
+
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -10,7 +12,7 @@ import java.util.Set;
 /**
  * Data model for an AAP domain
  */
-public class Domain implements Serializable {
+public class Domain implements Serializable, GrantedAuthority {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Domain.class);
     private static final long serialVersionUID = 1L;
@@ -86,5 +88,10 @@ public class Domain implements Serializable {
         result = 31 * result + domainDesc.hashCode();
         result = 31 * result + domainReference.hashCode();
         return result;
+    }
+
+    @Override
+    public String getAuthority() {
+        return "ROLE_"+domainName;
     }
 }

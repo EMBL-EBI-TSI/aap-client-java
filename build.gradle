@@ -29,7 +29,8 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter")
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-security")
-    testCompile("junit:junit")
+    compile("org.bitbucket.b_c:jose4j:0.5.2")
+    testCompile('org.springframework.boot:spring-boot-starter-test')
 }
 
 bootRepackage {
