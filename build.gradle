@@ -1,7 +1,7 @@
 buildscript {
     repositories {
         mavenCentral()
-        maven { url "http://ena-dev:8081/artifactory/all" }
+        maven { url "https://oss.sonatype.org/content/groups/public" }
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.3.RELEASE")
@@ -18,7 +18,7 @@ group = 'uk.ac.ebi.tsc.aap.client'
 version = '0.1-SNAPSHOT'
 
 repositories {
-    maven { url "http://ena-dev:8081/artifactory/all" }
+    maven { url "https://oss.sonatype.org/content/groups/public" }
     mavenCentral()
 }
 
@@ -49,13 +49,13 @@ publishing {
     repositories {
         maven {
             credentials {
-                username artifactoryUsername
-                password artifactoryPassword
+                username sonatypeUsername
+                password sonatypePassword
             }
             if(project.version.endsWith('-SNAPSHOT')) {
-                url "http://ena-dev:8081/artifactory/libs-snapshot-local"
+                url "https://oss.sonatype.org/content/repositories/snapshots"
             } else {
-                url "http://ena-dev:8081/artifactory/libs-release-local"
+                url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
             }
         }
     }
