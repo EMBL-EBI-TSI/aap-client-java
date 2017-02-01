@@ -28,7 +28,7 @@ public class TokenAuthenticationService {
         this.tokenHandler = tokenHandler;
     }
 
-    Authentication getAuthentication(HttpServletRequest request){
+    public Authentication getAuthentication(HttpServletRequest request){
         LOGGER.debug("In the[TokenAuthenticationService] - getAuthentication");
         try {
             final String header = request.getHeader(TOKEN_HEADER_KEY);
