@@ -57,19 +57,6 @@ publishing {
             artifact sourceJar { classifier "sources" }
         }
     }
-    repositories {
-        maven {
-            credentials {
-                username sonatypeUsername
-                password sonatypePassword
-            }
-            if(project.version.endsWith('-SNAPSHOT')) {
-                url "https://oss.sonatype.org/content/repositories/snapshots"
-            } else {
-                url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-            }
-        }
-    }
 }
 
 signing {
@@ -90,7 +77,7 @@ uploadArchives {
             }
 
             pom.project {
-                name 'aap-client-jar'
+                name 'aap-client-java'
                 packaging 'jar'
                 // optionally artifactId can be defined here
                 description 'EBI TSC AAP Client'
@@ -109,9 +96,14 @@ uploadArchives {
 
                 developers {
                     developer {
-                        id 'neilg'
+                        id 'ameliec'
                         name 'Amélie Cornélis'
                         email 'ameliec@ebi.ac.uk'
+                    }
+                    developer {
+                        id 'neilg'
+                        name 'Neil Goodgame'
+                        email 'neilg@ebi.ac.uk'
                     }
                 }
             }
