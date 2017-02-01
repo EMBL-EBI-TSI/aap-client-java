@@ -12,6 +12,8 @@ apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'maven-publish'
+apply plugin: 'maven'
+apply plugin: 'signing'
 
 group = 'uk.ac.ebi.tsc.aap.client'
 
@@ -43,6 +45,11 @@ jar {
 
 task sourceJar(type: Jar) { from sourceSets.main.allJava }
 
+artifacts {
+    archives jar
+    archives sourceJar
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -60,6 +67,53 @@ publishing {
                 url "https://oss.sonatype.org/content/repositories/snapshots"
             } else {
                 url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+            }
+        }
+    }
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'aap-client-jar'
+                packaging 'jar'
+                // optionally artifactId can be defined here
+                description 'EBI TSC AAP Client'
+                url 'https://github.com/EMBL-EBI-TSI/aap-client-java'
+
+                scm {
+                    url 'https://github.com/EMBL-EBI-TSI/aap-client-java'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'neilg'
+                        name 'Amélie Cornélis'
+                        email 'ameliec@ebi.ac.uk'
+                    }
+                }
             }
         }
     }
