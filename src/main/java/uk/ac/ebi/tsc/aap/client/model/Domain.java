@@ -72,10 +72,7 @@ public class Domain implements Serializable, GrantedAuthority {
         if (!(o instanceof Domain)){
             return false;
         }
-
         Domain domain = (Domain) o;
-
-        //if (!domainId.equals(domain.domainId)) return false;
         if (!domainName.equals(domain.domainName)) {
             return false;
         }
@@ -84,9 +81,9 @@ public class Domain implements Serializable, GrantedAuthority {
 
     @Override
     public int hashCode() {
-        int result = domainName.hashCode();
-        result = 31 * result + domainDesc.hashCode();
-        result = 31 * result + domainReference.hashCode();
+        int result = domainName != null ? domainName.hashCode() : 0;
+        result = (31 * result) + (domainDesc != null ?domainDesc.hashCode():0);
+        result = (31 * result) + (domainReference != null ?domainReference.hashCode():0);
         return result;
     }
 

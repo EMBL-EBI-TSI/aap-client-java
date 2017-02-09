@@ -7,9 +7,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Data model for an AAP user
@@ -22,15 +21,16 @@ public class User implements Serializable, UserDetails {
     private String userName;
     private String email;
     private String userReference;
-    private List<Domain> domains;
+    private Set<Domain> domains;
 
     public User(){}
 
-    public User(String userName, String email, String userReference) {
+    public User(String userName, String email, String userReference,Set<Domain> domains) {
+        LOGGER.info("User instantiation...");
         this.userName = userName;
         this.email = email;
         this.userReference = userReference;
-        domains = new ArrayList();
+        this.domains = domains;
     }
 
     public String getUserName() {
@@ -57,12 +57,12 @@ public class User implements Serializable, UserDetails {
         this.userReference = userReference;
     }
 
-    public List<Domain> getDomains() {
-        return domains;
+    public void setDomains(Set<Domain> domains) {
+        this.domains = domains;
     }
 
-    public void setDomains(List<Domain> domains) {
-        this.domains = domains;
+    public Set<Domain> getDomains() {
+        return domains;
     }
 
     @Override
@@ -88,8 +88,8 @@ public class User implements Serializable, UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.getDomains();
-    }
+        LOGGER.info("returning granted authorities for the user: "+userName);
+        return this.domains;}
 
     @Override
     public String getPassword() {
