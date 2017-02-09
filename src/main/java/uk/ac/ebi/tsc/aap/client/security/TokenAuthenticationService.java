@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import uk.ac.ebi.tsc.aap.client.model.User;
 
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author Amelie Cornelis  <ameliec@ebi.ac.uk>
  * @since 18/07/2016.
  */
+@Component //to support autowire
 public class TokenAuthenticationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TokenAuthenticationService.class);
@@ -45,7 +47,7 @@ public class TokenAuthenticationService {
                 LOGGER.trace("Missing jwt token");
                 return null;
             }
-            User user = tokenHandler.parseUserFromToken(token);
+             User user = tokenHandler.parseUserFromToken(token);
             return new UserAuthentication(user);
         }
         catch (IllegalArgumentException e){

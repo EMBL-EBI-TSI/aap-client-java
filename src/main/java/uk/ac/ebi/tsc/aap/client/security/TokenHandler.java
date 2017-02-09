@@ -8,6 +8,8 @@ import org.jose4j.jwt.consumer.JwtConsumerBuilder;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.stereotype.Component;
+import uk.ac.ebi.tsc.aap.client.model.Domain;
 import uk.ac.ebi.tsc.aap.client.model.User;
 
 import javax.annotation.PostConstruct;
@@ -15,6 +17,9 @@ import java.io.InputStream;
 import java.security.PublicKey;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Verify token validity and extract fields
@@ -22,11 +27,12 @@ import java.security.cert.X509Certificate;
  * @author Amelie Cornelis  <ameliec@ebi.ac.uk>
  * @since 18/07/2016.
  */
+@Component //to support autowire in the API
 public class TokenHandler {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(TokenHandler.class);
 
-    private JwtConsumer jwtConsumer;
+    public JwtConsumer jwtConsumer;
     @Value("${jwt.certificate}")
     private String certificatePath;
 
@@ -50,14 +56,17 @@ public class TokenHandler {
                 .build();
     }
 
-    User parseUserFromToken(String token) {
+   public User parseUserFromToken(String token) {
         try {
+            Set<Domain> domainsSet = new HashSet<>();
             JwtClaims jwtClaims = jwtConsumer.processToClaims(token);
-            String username = jwtClaims.getSubject();
+            String userReference = jwtClaims.getSubject();
             String nickname = jwtClaims.getStringClaimValue("nickname");
-            String email = jwtClaims.getStringClaimValue("email");
-            return new User(nickname, email, username);
-
+            //String email = jwtClaims.getStringClaimValue("email");
+            String email = "me@test.com"; //we are getting null email from token, we are hardcoding temporarily
+            List<String> domains = jwtClaims.getStringListClaimValue("domains");
+            domains.forEach(name->domainsSet.add(new Domain(name,null,null)));
+            return new User(nickname, email, userReference,domainsSet);
         } catch (InvalidJwtException | MalformedClaimException e) {
             LOGGER.debug("cannot parse token", e);
             throw new RuntimeException("Cannot parse token", e);
