@@ -62,8 +62,7 @@ public class TokenHandler {
             JwtClaims jwtClaims = jwtConsumer.processToClaims(token);
             String userReference = jwtClaims.getSubject();
             String nickname = jwtClaims.getStringClaimValue("nickname");
-            //String email = jwtClaims.getStringClaimValue("email");
-            String email = "me@test.com"; //we are getting null email from token, we are hardcoding temporarily
+            String email = jwtClaims.getStringClaimValue("email");
             List<String> domains = jwtClaims.getStringListClaimValue("domains");
             domains.forEach(name->domainsSet.add(new Domain(name,null,null)));
             return new User(nickname, email, userReference,domainsSet);
