@@ -6,8 +6,7 @@ import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.NumericDate;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
+import uk.ac.ebi.tsc.aap.client.model.User;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -30,7 +29,7 @@ public class TokenHandlerTest {
     static final private String username = "user1";
     private PrivateKey signingKey;
     private PublicKey verifyingKey;
-    private UserDetails mockUser;
+    private User mockUser;
 
     @Before
     public void setUp() throws Exception {

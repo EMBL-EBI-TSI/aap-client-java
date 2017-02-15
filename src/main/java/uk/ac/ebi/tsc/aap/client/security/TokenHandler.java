@@ -39,7 +39,11 @@ public class TokenHandler {
     @PostConstruct
     public void initPropertyDependentFields() throws Exception {
         LOGGER.trace("initPropertyDependentFields- certificatePath***** {}", certificatePath);
-        InputStream inputStream = new DefaultResourceLoader().getResource(certificatePath).getInputStream();
+        setJwtConsumer(certificatePath);
+    }
+
+    void setJwtConsumer(String path) throws Exception {
+        InputStream inputStream = new DefaultResourceLoader().getResource(path).getInputStream();
         final CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
         final X509Certificate certificate = (X509Certificate) certificateFactory.generateCertificate(inputStream);
         final PublicKey verifyingKey = certificate.getPublicKey();
