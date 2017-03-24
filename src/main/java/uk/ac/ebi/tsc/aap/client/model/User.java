@@ -26,7 +26,7 @@ public class User implements Serializable, UserDetails {
     public User(){}
 
     public User(String userName, String email, String userReference,Set<Domain> domains) {
-        LOGGER.info("User instantiation...");
+        LOGGER.trace("User instantiation...");
         this.userName = userName;
         this.email = email;
         this.userReference = userReference;
@@ -88,7 +88,7 @@ public class User implements Serializable, UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        LOGGER.info("returning granted authorities for the user: "+userName);
+        LOGGER.trace("returning granted authorities for the user: "+userName);
         return this.domains;}
 
     @Override
