@@ -34,8 +34,8 @@ public class DomainRepositoryRestTest {
 
     @Test public void
     retrieves_the_list_of_domain_from_the_api() {
-        String username = "3b69024773063d161ca43ac855cf3798b3991366";
-        String expectedUrl = String.format("/users/%s/domains", username);
+        String userReference = "foo-bar-buzz";
+        String expectedUrl = String.format("/users/%s/domains", userReference);
         String mockResponse = "[" +
                 "{" +
                 "  \"domainName\" : \"foo\"," +
@@ -48,7 +48,7 @@ public class DomainRepositoryRestTest {
                 "]";
         this.domainsApi.expect(requestTo(expectedUrl))
             .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
-        User user = user(username);
+        User user = user(userReference);
 
         Collection<String> domains = subject.getDomains(user, "irrelevant");
 
@@ -57,7 +57,7 @@ public class DomainRepositoryRestTest {
         assertThat(domains, hasItem("bar"));
     }
 
-    private User user(String username) {
-        return new User(username, null, null, null);
+    private User user(String userReference) {
+        return new User(null, null, userReference, null);
     }
 }

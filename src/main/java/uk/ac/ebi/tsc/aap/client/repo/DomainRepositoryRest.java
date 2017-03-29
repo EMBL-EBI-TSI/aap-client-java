@@ -34,10 +34,10 @@ public class DomainRepositoryRest implements DomainRepository {
     public Collection<String> getDomains(User user, String token) {
         HttpEntity<String> entity = new HttpEntity<>("parameters", createHeaders(token));
         ResponseEntity<List<Domain>> response = template.exchange(
-                "/users/{username}/domains",
+                "/users/{reference}/domains",
                 HttpMethod.GET, entity,
                 new ParameterizedTypeReference<List<Domain>>() {},
-                user.getUsername());
+                user.getUserReference());
         return response.getBody().stream()
                 .map(Domain::getDomainName)
                 .collect(Collectors.toList());
