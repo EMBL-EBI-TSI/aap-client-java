@@ -21,12 +21,13 @@ public class DomainService {
         this.repo = repository;
     }
 
-    public Collection<String> getDomains(User user, String token) {
+    public Collection<Domain> getDomains(User user, String token) {
         return repo.getDomains(user, token);
     }
 
     public Domain createDomain(String name, String description, String token) {
-        return repo.createDomain(name, description, token);
+        Domain toAdd = new Domain(name, description, null);
+        return repo.createDomain(toAdd, token);
     }
 
     public Domain deleteDomain(Domain toDelete, String token) {

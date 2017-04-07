@@ -17,9 +17,10 @@ import uk.ac.ebi.tsc.aap.client.model.User;
 import java.util.Collection;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.contains;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
@@ -63,16 +64,19 @@ public class DomainRepositoryRestTest {
             .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
         User user = user(userReference);
 
-        Collection<String> domains = subject.getDomains(user, "a-token");
+        Collection<Domain> domains = subject.getDomains(user, "a-token");
 
         this.domainsApi.verify();
         assertThat(domains.size(), equalTo(2));
-        assertThat(domains, hasItem("foo"));
-        assertThat(domains, hasItem("bar"));
+        assertThat(domains, contains(
+                hasProperty("domainName", equalTo("foo")),
+                hasProperty("domainName", equalTo("bar"))
+        ));
     }
 
     @Test public void
     can_create_a_domain() {
+        Domain domain = domain("foo", "The Foo");
         String mockResponse =
             "{" +
                 "  \"domainReference\" : \"usr-abcdef\"" +
@@ -80,7 +84,7 @@ public class DomainRepositoryRestTest {
         this.domainsApi.expect(requestTo("/domains/")).andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.CREATED).body(mockResponse).contentType(MediaType.APPLICATION_JSON));
 
-        Domain created = subject.createDomain("foo", "The Foo", "a-token");
+        Domain created = subject.createDomain(domain, "a-token");
 
         this.domainsApi.verify();
         assertThat(created.getDomainReference(), equalTo("usr-abcdef"));
@@ -91,7 +95,7 @@ public class DomainRepositoryRestTest {
         this.domainsApi.expect(requestTo("/domains/")).andExpect(method(HttpMethod.POST))
                 .andRespond(withServerError());
 
-        subject.createDomain("bar", "The Bar", "a-token");
+        subject.createDomain(aDomain(), "a-token");
 
         this.domainsApi.verify();
     }
@@ -101,9 +105,17 @@ public class DomainRepositoryRestTest {
         this.domainsApi.expect(requestTo("/domains/")).andExpect(method(HttpMethod.POST))
                 .andRespond(withTimeout());
 
-        subject.createDomain("bar", "The Bar", "a-token");
+        subject.createDomain(aDomain(), "a-token");
 
         this.domainsApi.verify();
+    }
+
+    private Domain domain(String name, String description) {
+        return new Domain(name, description, null);
+    }
+
+    private Domain aDomain() {
+        return domain("wonderland", "The Wonderland");
     }
 
     @Test public void

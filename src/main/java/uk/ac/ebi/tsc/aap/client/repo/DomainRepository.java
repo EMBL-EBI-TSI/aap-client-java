@@ -11,9 +11,9 @@ import java.util.Collection;
  */
 public interface DomainRepository {
 
-    Collection<String> getDomains(User user, String token);
+    Collection<Domain> getDomains(User user, String token);
 
-    Domain createDomain(String name, String description, String token);
+    Domain createDomain(Domain toAdd, String token);
 
     Domain deleteDomain(Domain toDelete, String token);
 }

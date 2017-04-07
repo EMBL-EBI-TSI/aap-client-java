@@ -37,20 +37,17 @@ public class DomainRepositoryRest implements DomainRepository {
     }
 
     @Override
-    public Collection<String> getDomains(User user, String token) {
+    public Collection<Domain> getDomains(User user, String token) {
         HttpEntity<String> entity = new HttpEntity<>("parameters", createHeaders(token));
         ResponseEntity<User> response = template.exchange(
                 "/users/{reference}/domains",
                 HttpMethod.GET, entity, User.class, user.getUserReference());
-        return response.getBody().getDomains().stream()
-                .map(Domain::getDomainName)
-                .collect(Collectors.toList());
+        return response.getBody().getDomains();
     }
 
     @Override
-    public Domain createDomain(String name, String description, String token) {
-        Domain domain = new Domain(name, description, null);
-        HttpEntity<Domain> entity = new HttpEntity<>(domain, createHeaders(token));
+    public Domain createDomain(Domain toAdd, String token) {
+        HttpEntity<Domain> entity = new HttpEntity<>(toAdd, createHeaders(token));
         ResponseEntity<Domain> response = template.exchange(
                 "/domains/", HttpMethod.POST,
                 entity, Domain.class);
