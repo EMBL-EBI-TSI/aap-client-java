@@ -1,5 +1,6 @@
 package uk.ac.ebi.tsc.aap.client.repo;
 
+import uk.ac.ebi.tsc.aap.client.model.Domain;
 import uk.ac.ebi.tsc.aap.client.model.User;
 
 import java.util.Collection;
@@ -11,4 +12,6 @@ import java.util.Collection;
 public interface DomainRepository {
 
     Collection<String> getDomains(User user, String token);
+
+    Domain createDomain(String name, String description, String token);
 }

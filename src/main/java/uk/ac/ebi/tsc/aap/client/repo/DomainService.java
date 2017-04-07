@@ -2,6 +2,7 @@ package uk.ac.ebi.tsc.aap.client.repo;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.ac.ebi.tsc.aap.client.model.Domain;
 import uk.ac.ebi.tsc.aap.client.model.User;
 
 import java.util.Collection;
@@ -22,5 +23,9 @@ public class DomainService {
 
     public Collection<String> getDomains(User user, String token) {
         return repo.getDomains(user, token);
+    }
+
+    public Domain createDomain(String name, String description, String token) {
+        return repo.createDomain(name, description, token);
     }
 }

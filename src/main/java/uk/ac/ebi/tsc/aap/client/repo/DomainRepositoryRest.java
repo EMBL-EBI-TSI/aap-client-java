@@ -25,12 +25,18 @@ public class DomainRepositoryRest implements DomainRepository {
 
     private final RestTemplate template;
 
-    public DomainRepositoryRest(@Value("${aap.domains.url}") String domainsApiUrl, RestTemplateBuilder clientBuilder) {
+    public DomainRepositoryRest(
+            @Value("${aap.domains.url}") String domainsApiUrl,
+            @Value("${aap.timeout:180000}") int timeout,
+            RestTemplateBuilder clientBuilder) {
         this.template = clientBuilder
                 .rootUri(domainsApiUrl)
+                .setConnectTimeout(timeout)
+                .setReadTimeout(timeout)
                 .build();
     }
 
+    @Override
     public Collection<String> getDomains(User user, String token) {
         HttpEntity<String> entity = new HttpEntity<>("parameters", createHeaders(token));
         ResponseEntity<User> response = template.exchange(
@@ -39,6 +45,16 @@ public class DomainRepositoryRest implements DomainRepository {
         return response.getBody().getDomains().stream()
                 .map(Domain::getDomainName)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Domain createDomain(String name, String description, String token) {
+        Domain domain = new Domain(name, description, null);
+        HttpEntity<Domain> entity = new HttpEntity<>(domain, createHeaders(token));
+        ResponseEntity<Domain> response = template.exchange(
+                "/domains/", HttpMethod.POST,
+                entity, Domain.class);
+        return response.getBody();
     }
 
     private HttpHeaders createHeaders(String token){
