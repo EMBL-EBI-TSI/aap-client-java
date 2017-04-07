@@ -28,4 +28,8 @@ public class DomainService {
     public Domain createDomain(String name, String description, String token) {
         return repo.createDomain(name, description, token);
     }
+
+    public Domain deleteDomain(Domain toDelete, String token) {
+        return repo.deleteDomain(toDelete, token);
+    }
 }

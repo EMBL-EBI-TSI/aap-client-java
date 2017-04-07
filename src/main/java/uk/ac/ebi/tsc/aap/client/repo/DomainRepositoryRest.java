@@ -57,6 +57,15 @@ public class DomainRepositoryRest implements DomainRepository {
         return response.getBody();
     }
 
+    @Override
+    public Domain deleteDomain(Domain toDelete, String token) {
+        HttpEntity<Domain> entity = new HttpEntity<>(toDelete, createHeaders(token));
+        ResponseEntity<Domain> response = template.exchange(
+                "/domains/{domainReference}", HttpMethod.DELETE,
+                entity, Domain.class, toDelete.getDomainReference());
+        return response.getBody();
+    }
+
     private HttpHeaders createHeaders(String token){
         return new HttpHeaders() {{
             String authHeader = "Bearer " + token;

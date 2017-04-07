@@ -18,6 +18,7 @@ import java.util.Collection;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -103,6 +104,20 @@ public class DomainRepositoryRestTest {
         subject.createDomain("bar", "The Bar", "a-token");
 
         this.domainsApi.verify();
+    }
+
+    @Test public void
+    can_delete_domain() {
+        String domainReference = "foo-bar";
+        Domain toDelete = new Domain(null, null, domainReference);
+        String expectedUrl = String.format("/domains/%s", domainReference);
+        this.domainsApi.expect(requestTo(expectedUrl))
+                .andRespond(withSuccess().body("{\"domainReference\" : \""+domainReference+"\"}").contentType(MediaType.APPLICATION_JSON));
+
+        Domain deleted = subject.deleteDomain(toDelete,"a-token");
+
+        this.domainsApi.verify();
+        assertThat(deleted, notNullValue());
     }
 
     private User user(String userReference) {
