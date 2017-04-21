@@ -33,27 +33,10 @@ public class TokenAuthenticationService {
     public Authentication getAuthentication(HttpServletRequest request){
         LOGGER.debug("In the[TokenAuthenticationService] - getAuthentication");
         try {
-            final String header = request.getHeader(TOKEN_HEADER_KEY);
-            if (header == null || !header.trim().startsWith(TOKEN_HEADER_VALUE_PREFIX.trim())) {
-                LOGGER.trace("No {} header", TOKEN_HEADER_KEY);
-                return null;
-            }
-            else if (!header.trim().startsWith(TOKEN_HEADER_VALUE_PREFIX.trim())) {
-                LOGGER.trace("No {} prefix", TOKEN_HEADER_VALUE_PREFIX);
-                return null;
-            }
-            final String token = header.substring(TOKEN_HEADER_VALUE_PREFIX.trim().length());
-            if (StringUtils.isEmpty(token)) {
-                LOGGER.trace("Missing jwt token");
-                return null;
-            }
-             User user = tokenHandler.parseUserFromToken(token);
+            final String token = extractToken(request);
+            if (token == null) return null;
+            User user = tokenHandler.parseUserFromToken(token);
             return new UserAuthentication(user);
-        }
-        catch (IllegalArgumentException e){
-            LOGGER.error(e.getMessage());
-            LOGGER.trace("", e);
-            return null;
         }
         catch (Exception e) {
             LOGGER.error(e.getMessage());
@@ -61,5 +44,23 @@ public class TokenAuthenticationService {
             return null;
         }
 
+    }
+
+    public String extractToken(HttpServletRequest request) {
+        final String header = request.getHeader(TOKEN_HEADER_KEY);
+        if (header == null || !header.trim().startsWith(TOKEN_HEADER_VALUE_PREFIX.trim())) {
+            LOGGER.trace("No {} header", TOKEN_HEADER_KEY);
+            return null;
+        }
+        else if (!header.trim().startsWith(TOKEN_HEADER_VALUE_PREFIX.trim())) {
+            LOGGER.trace("No {} prefix", TOKEN_HEADER_VALUE_PREFIX);
+            return null;
+        }
+        final String token = header.substring(TOKEN_HEADER_VALUE_PREFIX.trim().length());
+        if (StringUtils.isEmpty(token)) {
+            LOGGER.trace("Missing jwt token");
+            return null;
+        }
+        return token;
     }
 }
