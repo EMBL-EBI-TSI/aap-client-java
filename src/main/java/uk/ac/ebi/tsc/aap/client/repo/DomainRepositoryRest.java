@@ -60,6 +60,15 @@ public class DomainRepositoryRest implements DomainRepository {
         return response.getBody();
     }
 
+    @Override
+    public Domain addUserToDomain(Domain toJoin, User toAdd, String token) {
+        HttpEntity<String> entity = new HttpEntity<>("parameters", createHeaders(token));
+        ResponseEntity<Domain> response = template.exchange(
+                "/domains/{dom-reference}/{usr-reference}/user",
+                HttpMethod.PUT, entity, Domain.class, toJoin.getDomainReference(), toAdd.getUserReference());
+        return response.getBody();
+    }
+
     private HttpHeaders createHeaders(String token){
         return new HttpHeaders() {{
             String authHeader = "Bearer " + token;

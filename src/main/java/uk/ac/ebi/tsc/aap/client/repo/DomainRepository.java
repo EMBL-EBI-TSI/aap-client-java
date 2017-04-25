@@ -16,4 +16,6 @@ public interface DomainRepository {
     Domain createDomain(Domain toAdd, String token);
 
     Domain deleteDomain(Domain toDelete, String token);
+
+    Domain addUserToDomain(Domain toJoin, User toAdd, String token);
 }

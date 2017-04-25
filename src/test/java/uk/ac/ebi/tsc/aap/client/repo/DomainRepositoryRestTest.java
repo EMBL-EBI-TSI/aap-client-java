@@ -132,6 +132,32 @@ public class DomainRepositoryRestTest {
         assertThat(deleted, notNullValue());
     }
 
+    @Test public void
+    can_add_user_to_a_domain() {
+        Domain toJoin = new Domain(null, null, "the-foo");
+        User toAdd = user("the-bar");
+        String expectedUrl = String.format("/domains/%s/%s/user", toJoin.getDomainReference(), toAdd.getUserReference());
+        String mockResponse =
+                "{" +
+                "  \"domainReference\" : \"d7087264-9111-4693-9ea6-233898d91025\"," +
+                "  \"adminDomainReference\" : \"c06688f3-1ee8-4a84-b8c3-7ef735f6a18c\"," +
+                "  \"domainName\" : \"Test Test\"," +
+                "  \"domainDesc\" : \"Test Domain\"," +
+                "  \"users\" : [ {" +
+                "    \"userReference\" : \"12845ac8-e71e-45d4-8e85-3dee7d98664e\"," +
+                "    \"userName\" : \"someone\"," +
+                "    \"email\" : \"test@example.com\"" +
+                "  } ]" +
+                "}";
+        this.domainsApi.expect(requestTo(expectedUrl)).andExpect(method(HttpMethod.PUT))
+                .andRespond(withSuccess().body(mockResponse).contentType(MediaType.APPLICATION_JSON));
+
+        Domain updated = subject.addUserToDomain(toJoin, toAdd, "a-token");
+
+        this.domainsApi.verify();
+        assertThat(updated.getUsers(), notNullValue());
+    }
+
     private User user(String userReference) {
         return new User(null, null, userReference, null);
     }

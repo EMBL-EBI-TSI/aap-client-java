@@ -56,6 +56,10 @@ public class Domain implements Serializable, GrantedAuthority {
         this.domainReference = domainReference;
     }
 
+    public Set<User> getUsers() {
+        return users;
+    }
+
     @Override
     public String toString() {
         return "Domain{" +
