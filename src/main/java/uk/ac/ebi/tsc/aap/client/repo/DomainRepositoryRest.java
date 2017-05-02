@@ -2,6 +2,7 @@ package uk.ac.ebi.tsc.aap.client.repo;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -12,6 +13,7 @@ import uk.ac.ebi.tsc.aap.client.model.Domain;
 import uk.ac.ebi.tsc.aap.client.model.User;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Amelie Cornelis <ameliec@ebi.ac.uk>
@@ -36,10 +38,10 @@ public class DomainRepositoryRest implements DomainRepository {
     @Override
     public Collection<Domain> getDomains(User user, String token) {
         HttpEntity<String> entity = new HttpEntity<>("parameters", createHeaders(token));
-        ResponseEntity<User> response = template.exchange(
+        ResponseEntity<List<Domain>> response = template.exchange(
                 "/users/{reference}/domains",
-                HttpMethod.GET, entity, User.class, user.getUserReference());
-        return response.getBody().getDomains();
+                HttpMethod.GET, entity, new ParameterizedTypeReference<List<Domain>>() {
+        return response.getBody();
     }
 
     @Override

@@ -45,12 +45,8 @@ public class DomainRepositoryRestTest {
     retrieves_the_list_of_domain_from_the_api() {
         String userReference = "foo-bar-buzz";
         String expectedUrl = String.format("/users/%s/domains", userReference);
-        String mockResponse = "{" +
-                "  \"userReference\" : \"foo-bar-buz\"," +
-                "  \"userName\" : \"someone\"," +
-                "  \"email\" : \"someone@somewhere.com\"," +
-                "  \"mobile\" : \"1234\"," +
-                "  \"domains\" : [" +
+        String mockResponse =
+                " [" +
                 "{" +
                 "  \"domainName\" : \"foo\"," +
                 "  \"domainDesc\" : \"The Foo\"" +
@@ -59,7 +55,7 @@ public class DomainRepositoryRestTest {
                 "  \"domainName\" : \"bar\"," +
                 "  \"domainDesc\" : \"The Bar\"" +
                 "}" +
-                "]}";
+                "]";
         this.domainsApi.expect(requestTo(expectedUrl))
             .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
         User user = user(userReference);
