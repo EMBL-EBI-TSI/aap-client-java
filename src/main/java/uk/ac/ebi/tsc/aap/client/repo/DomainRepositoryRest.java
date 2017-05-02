@@ -40,7 +40,8 @@ public class DomainRepositoryRest implements DomainRepository {
         HttpEntity<String> entity = new HttpEntity<>("parameters", createHeaders(token));
         ResponseEntity<List<Domain>> response = template.exchange(
                 "/users/{reference}/domains",
-                HttpMethod.GET, entity, new ParameterizedTypeReference<List<Domain>>() {
+                HttpMethod.GET, entity, new ParameterizedTypeReference<List<Domain>>() {},
+                user.getUserReference());
         return response.getBody();
     }
 
