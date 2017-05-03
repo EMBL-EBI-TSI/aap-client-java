@@ -1,0 +1,6 @@
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter-security")
+    compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.bitbucket.b_c:jose4j:0.5.2")
+    compile project(':model')
+}
