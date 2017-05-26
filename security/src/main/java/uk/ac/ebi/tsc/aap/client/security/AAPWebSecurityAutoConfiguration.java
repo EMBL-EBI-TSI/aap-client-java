@@ -3,6 +3,7 @@ package uk.ac.ebi.tsc.aap.client.security;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +22,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @SuppressWarnings("SpringJavaAutowiringInspection")
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-@ComponentScan("uk.ac.ebi.tsc.aap.client")
+@ComponentScan("uk.ac.ebi.tsc.aap.client.security")
+@ConditionalOnMissingBean(AAPWebSecurityAutoConfiguration.AAPWebSecurityConfig.class)
 public class AAPWebSecurityAutoConfiguration {
 
     @EnableWebSecurity(debug = true)
@@ -34,7 +36,6 @@ public class AAPWebSecurityAutoConfiguration {
 
         @Autowired
         private TokenAuthenticationService tokenAuthenticationService;
-
 
         private StatelessAuthenticationFilter statelessAuthenticationFilterBean() throws Exception {
             LOGGER.info("this.tokenAuthenticationService: " + this.tokenAuthenticationService);
@@ -65,7 +66,7 @@ public class AAPWebSecurityAutoConfiguration {
     }
 
     @Bean
-    AAPWebSecurityAutoConfiguration aapWebSecurityAutoConfiguration() {
-        return new AAPWebSecurityAutoConfiguration();
+    AAPWebSecurityConfig aapWebSecurityAutoConfiguration() {
+        return new AAPWebSecurityConfig();
     }
 }
