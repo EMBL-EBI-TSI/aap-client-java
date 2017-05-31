@@ -6,7 +6,12 @@ using spring.
 
 ## Getting Started
 
-Include the jar as dependency to your project (for example with gradle):
+Choose which aspect of the client you'd like to use:
+- `security` helps protect your API's endpoint via a token produced by the AAP
+- `service` helps making calls to the AAP API
+
+
+Include the jar as dependency to your project (for example `service` with gradle):
 
 ```groovy
 repositories {
@@ -14,7 +19,7 @@ repositories {
 }
 
 dependencies {
-   	compile( group: 'uk.ac.ebi.tsc.aap.client', name: 'aap-client-java', version: '0.1-SNAPSHOT')
+	compile( group: 'uk.ac.ebi.tsc.aap.client', name: 'service', version: '0.1-SNAPSHOT')
 }
 ```
 
