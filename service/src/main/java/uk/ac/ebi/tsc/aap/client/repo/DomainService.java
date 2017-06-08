@@ -46,4 +46,8 @@ public class DomainService {
     public Domain removeUserFromDomain(User toBeRemoved, Domain toBeUpdated, String token){
     	return repo.removeUserFromDomain(toBeRemoved, toBeUpdated, token);
     }
+    
+    public Collection<User> getAllUsersFromDomain(String domainReference, String token){
+    	return repo.getAllUsersFromDomain(domainReference, token);
+    }
 }

@@ -197,6 +197,32 @@ public class DomainRepositoryRestTest {
 		toJoin = subject.removeUserFromDomain(toAdd, toJoin, "token");
 		this.domainsApi.verify();
 		
+		assertThat(toJoin.getUsers().size(), is(0));
+	}
+	
+	@Test
+	public void can_get_list_of_users_for_domain(){
+		
+		String domainReference = "domainReference";
+		
+		String mockResponse = "[ {\n  \"userReference\" : \"57d94c6d-565c-46b8-aabe-49c9461fc707\",\n "
+				+ " \"userName\" : \"946838e27f8831afd866ff6f66ad37f075626ae3\",\n  \"email\" :"
+				+ " \"navispretheeba@gmail.com\",\n  \"mobile\" : null,\n  \"domains\" : null,\n  "
+				+ "\"links\" : [ {\n    \"rel\" : \"self\",\n   "
+				+ " \"href\" : \"https://dev.api.aap.tsi.ebi.ac.uk/users/usr-57d94c6d-565c-46b8-aabe-49c9461fc707\"\n  } ]\n} ]";
+				
+		String expectedUrl = String.format("/domains/dom-%s/users", domainReference);	
+		
+		this.domainsApi.expect(requestTo(expectedUrl)).andExpect(method(HttpMethod.GET))
+		.andRespond(withSuccess().body(mockResponse).contentType(MediaType.APPLICATION_JSON));
+		
+
+		Collection<User> users = subject.getAllUsersFromDomain(domainReference, "token");
+		
+		this.domainsApi.verify();
+		
+		assertThat(users.size(), is(1));
+		
 	}
 
 	private User user(String userReference) {

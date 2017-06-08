@@ -22,4 +22,6 @@ public interface DomainRepository {
     Domain getDomainByReference(String reference, String token);
     
     Domain removeUserFromDomain(User toBeRemoved, Domain toBeUpdated, String token);
+    
+    Collection<User> getAllUsersFromDomain(String domainReference, String token);
 }

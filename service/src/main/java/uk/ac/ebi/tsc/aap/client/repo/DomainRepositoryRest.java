@@ -89,6 +89,16 @@ public class DomainRepositoryRest implements DomainRepository {
                  entity, Domain.class, toBeUpdated.getDomainReference(), toBeRemoved.getUserReference());
          return response.getBody();
     }
+    
+    @Override
+    public Collection<User> getAllUsersFromDomain(String domainReference, String token){
+    	 HttpEntity<?> entity = new HttpEntity<>(createHeaders(token));
+    	 ResponseEntity<List<User>> response = template.exchange(
+                 "/domains/dom-{domainReference}/users",
+                 HttpMethod.GET, entity, new ParameterizedTypeReference<List<User>>() {},
+                 domainReference);
+         return response.getBody();
+    }
 
     private HttpHeaders createHeaders(String token){
         return new HttpHeaders() {{
