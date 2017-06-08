@@ -33,4 +33,17 @@ public class DomainService {
     public Domain deleteDomain(Domain toDelete, String token) {
         return repo.deleteDomain(toDelete, token);
     }
+    
+    public Domain getDomainByReference(String reference, String token){
+    	return repo.getDomainByReference(reference, token);
+    	
+    }
+    
+    public Domain addUserToDomain(Domain toJoin, User toAdd, String token){
+    	return repo.addUserToDomain(toJoin, toAdd, token);
+    }
+    
+    public Domain removeUserFromDomain(User toBeRemoved, Domain toBeUpdated, String token){
+    	return repo.removeUserFromDomain(toBeRemoved, toBeUpdated, token);
+    }
 }

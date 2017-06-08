@@ -18,4 +18,8 @@ public interface DomainRepository {
     Domain deleteDomain(Domain toDelete, String token);
 
     Domain addUserToDomain(Domain toJoin, User toAdd, String token);
+    
+    Domain getDomainByReference(String reference, String token);
+    
+    Domain removeUserFromDomain(User toBeRemoved, Domain toBeUpdated, String token);
 }
