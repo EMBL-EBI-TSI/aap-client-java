@@ -23,12 +23,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @SuppressWarnings("SpringJavaAutowiringInspection")
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @ComponentScan("uk.ac.ebi.tsc.aap.client.security")
-@ConditionalOnMissingBean(AAPWebSecurityAutoConfiguration.AAPWebSecurityConfig.class)
+@ConditionalOnMissingBean(WebSecurityConfigurerAdapter.class)
 public class AAPWebSecurityAutoConfiguration {
 
     @EnableWebSecurity(debug = true)
     @Configuration("AAPConfig")
-    static  class AAPWebSecurityConfig extends WebSecurityConfigurerAdapter {
+    public static  class AAPWebSecurityConfig extends WebSecurityConfigurerAdapter {
         private static final Logger LOGGER = LoggerFactory.getLogger(AAPWebSecurityConfig.class);
 
         @Autowired
@@ -51,7 +51,7 @@ public class AAPWebSecurityAutoConfiguration {
                     .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                     // don't create session
                     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                    .authorizeRequests().anyRequest().authenticated();
+                    .authorizeRequests().anyRequest().anonymous();
 
             httpSecurity.addFilterBefore(statelessAuthenticationFilterBean(),
                     UsernamePasswordAuthenticationFilter.class);
