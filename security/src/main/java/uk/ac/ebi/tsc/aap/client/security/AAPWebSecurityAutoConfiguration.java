@@ -51,7 +51,7 @@ public class AAPWebSecurityAutoConfiguration {
                     .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                     // don't create session
                     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                    .authorizeRequests().anyRequest().anonymous();
+                    .authorizeRequests().anyRequest().authenticated();
 
             httpSecurity.addFilterBefore(statelessAuthenticationFilterBean(),
                     UsernamePasswordAuthenticationFilter.class);
@@ -66,7 +66,8 @@ public class AAPWebSecurityAutoConfiguration {
     }
 
     @Bean
-    AAPWebSecurityConfig aapWebSecurityAutoConfiguration() {
+    @ConditionalOnMissingBean
+    WebSecurityConfigurerAdapter aapWebSecurityAutoConfiguration() {
         return new AAPWebSecurityConfig();
     }
 }
