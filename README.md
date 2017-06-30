@@ -6,7 +6,12 @@ using spring.
 
 ## Getting Started
 
-Include the jar as dependency to your project (for example with gradle):
+Choose which aspect of the client you'd like to use:
+- `security` helps protect your API's endpoint via a token produced by the AAP
+- `service` helps making calls to the AAP API
+
+
+Include the jar as dependency to your project (for example `service` with gradle):
 
 ```groovy
 repositories {
@@ -14,7 +19,7 @@ repositories {
 }
 
 dependencies {
-   	compile( group: 'uk.ac.ebi.tsc.aap.client', name: 'aap-client-java', version: '0.1-SNAPSHOT')
+	compile( group: 'uk.ac.ebi.tsc.aap.client', name: 'service', version: '0.1-SNAPSHOT')
 }
 ```
 
@@ -25,6 +30,20 @@ Use the provided classes to secure your API: more to come on this section soon!
 We are using this library with a few spring-boot applications, and anything with spring-security/spring-web
 should be easy to infer.
 
+For building the components, you'll need to have setup a GPG signing key (for example by following the [instructions of
+the good folks of github](https://help.github.com/articles/generating-a-new-gpg-key/#generating-a-gpg-key)), and define
+a signatory in gradle (typically in `~/.gradle/gradle.properties`):
+```
+signing.keyId=1A2B3C4D
+signing.password=changeme
+signing.secretKeyRingFile=path/to/secring.gpg
+```
+
+It is also necessary to have defined the following variables (even if you are not using the uploadArchive task):
+```
+ossrhUsername=someone
+ossrhPassword=secret
+```
 
 ### Installing
 

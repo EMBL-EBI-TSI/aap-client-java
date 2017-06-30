@@ -71,6 +71,34 @@ public class DomainRepositoryRest implements DomainRepository {
                 HttpMethod.PUT, entity, Domain.class, toJoin.getDomainReference(), toAdd.getUserReference());
         return response.getBody();
     }
+    
+    @Override
+    public Domain getDomainByReference(String reference, String token){
+    	HttpEntity<String> entity = new HttpEntity<>("parameters", createHeaders(token));
+        ResponseEntity<Domain> response = template.exchange(
+                "/domains/dom-{domainReference}",
+                HttpMethod.GET, entity,new ParameterizedTypeReference<Domain>() {}, reference);
+        return response.getBody();
+    }
+    
+    @Override
+    public Domain removeUserFromDomain(User toBeRemoved, Domain toBeUpdated, String token){
+    	 HttpEntity<User> entity = new HttpEntity<>(toBeRemoved, createHeaders(token));
+         ResponseEntity<Domain> response = template.exchange(
+                 "/domains/dom-{domainReference}/usr-{userReference}/user", HttpMethod.DELETE,
+                 entity, Domain.class, toBeUpdated.getDomainReference(), toBeRemoved.getUserReference());
+         return response.getBody();
+    }
+    
+    @Override
+    public Collection<User> getAllUsersFromDomain(String domainReference, String token){
+    	 HttpEntity<?> entity = new HttpEntity<>(createHeaders(token));
+    	 ResponseEntity<List<User>> response = template.exchange(
+                 "/domains/dom-{domainReference}/users",
+                 HttpMethod.GET, entity, new ParameterizedTypeReference<List<User>>() {},
+                 domainReference);
+         return response.getBody();
+    }
 
     private HttpHeaders createHeaders(String token){
         return new HttpHeaders() {{
