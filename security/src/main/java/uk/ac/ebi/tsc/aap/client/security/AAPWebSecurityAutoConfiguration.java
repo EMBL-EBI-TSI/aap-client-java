@@ -31,7 +31,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @ConditionalOnWebApplication
 @EnableWebSecurity
 @ComponentScan("uk.ac.ebi.tsc.aap.client.security")
-@PropertySource(value = "/application-security.properties")
+@PropertySource(value = "classpath:/application-security.properties")
 public class AAPWebSecurityAutoConfiguration {
 
     @Configuration
