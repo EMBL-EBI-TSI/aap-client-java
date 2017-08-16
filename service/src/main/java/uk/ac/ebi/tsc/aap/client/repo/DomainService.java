@@ -50,4 +50,13 @@ public class DomainService {
     public Collection<User> getAllUsersFromDomain(String domainReference, String token){
     	return repo.getAllUsersFromDomain(domainReference, token);
     }
+
+    /**
+     * Gets the current user membership domains
+     * @param token - user token
+     * @return Collection<Domain></Domain> - list of membership domains
+     */
+    public Collection<Domain> getMyDomains(String token){
+        return repo.getMyDomains(token);
+    }
 }

@@ -24,4 +24,12 @@ public interface DomainRepository {
     Domain removeUserFromDomain(User toBeRemoved, Domain toBeUpdated, String token);
     
     Collection<User> getAllUsersFromDomain(String domainReference, String token);
+
+    /***
+     * Get loggedin user membership domains
+     * @param token - user token
+     * @return list of membership domains
+     */
+    Collection<Domain> getMyDomains(String token);
+
 }

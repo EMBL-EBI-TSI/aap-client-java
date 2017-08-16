@@ -100,6 +100,20 @@ public class DomainRepositoryRest implements DomainRepository {
          return response.getBody();
     }
 
+    /***
+     * Get loggedin user membership domains
+     * @param token - user token
+     * @return list of membership domains
+     */
+    @Override
+    public Collection<Domain> getMyDomains(String token) {
+        HttpEntity<String> entity = new HttpEntity<>("parameters", createHeaders(token));
+        ResponseEntity<List<Domain>> response = template.exchange(
+                "/my/domains",
+                HttpMethod.GET, entity, new ParameterizedTypeReference<List<Domain>>() {});
+        return response.getBody();
+    }
+
     private HttpHeaders createHeaders(String token){
         return new HttpHeaders() {{
             String authHeader = "Bearer " + token;
