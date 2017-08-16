@@ -1,7 +1,6 @@
 package uk.ac.ebi.tsc.aap.client.repo;
 
 import org.junit.Test;
-import static org.junit.Assert.assertTrue;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
@@ -14,15 +13,14 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
 import uk.ac.ebi.tsc.aap.client.model.Domain;
 import uk.ac.ebi.tsc.aap.client.model.User;
-
 import java.util.Collection;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
@@ -223,6 +221,39 @@ public class DomainRepositoryRestTest {
 		
 		assertThat(users.size(), is(1));
 		
+	}
+
+	@Test
+	public void should_retrieve_list_of_membership_domains(){
+		String mockResponse =
+				" [" +
+						"{" +
+						"  \"domainName\" : \"foo\"," +
+						"  \"domainDesc\" : \"The Foo\"" +
+						"}, " +
+						"{" +
+						"  \"domainName\" : \"bar\"," +
+						"  \"domainDesc\" : \"The Bar\"" +
+						"}" +
+						"]";
+		this.domainsApi.expect(requestTo("/my/domains")).andExpect(method(HttpMethod.GET))
+				.andRespond(withSuccess().body(mockResponse).contentType(MediaType.APPLICATION_JSON));
+		Collection<Domain> domains = subject.getMyDomains("a-token");
+
+		this.domainsApi.verify();
+		assertThat(domains.size(), equalTo(2));
+		assertThat(domains, contains(
+				hasProperty("domainName", equalTo("foo")),
+				hasProperty("domainName", equalTo("bar"))
+		));
+	}
+
+	@Test(expected = RuntimeException.class)
+	public void should_return_server_error_if_something_goes_wrong_while_getting_membership_domains(){
+		this.domainsApi.expect(requestTo("/my/domains")).andExpect(method(HttpMethod.GET))
+				.andRespond(withServerError());
+		subject.getMyDomains("a-token");
+		this.domainsApi.verify();
 	}
 
 	private User user(String userReference) {
