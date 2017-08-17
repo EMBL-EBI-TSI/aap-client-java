@@ -59,4 +59,13 @@ public class DomainService {
     public Collection<Domain> getMyDomains(String token){
         return repo.getMyDomains(token);
     }
+
+    /**
+     * Gets logged in user management domains
+     * @param token - user token
+     * @return List<Domain></Domain> - list of management domains
+     */
+    public Collection<Domain> getMyManagementDomains(String token){
+        return repo.getMyManagementDomains(token);
+    }
 }

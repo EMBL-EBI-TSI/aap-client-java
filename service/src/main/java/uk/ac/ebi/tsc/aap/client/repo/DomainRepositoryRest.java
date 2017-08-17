@@ -114,6 +114,21 @@ public class DomainRepositoryRest implements DomainRepository {
         return response.getBody();
     }
 
+    /**
+     * Gets the logged in user management domains
+     *
+     * @param token - user token
+     * @return List<Domain></Domain> - management domains
+     */
+    @Override
+    public Collection<Domain> getMyManagementDomains(String token) {
+        HttpEntity<String> entity = new HttpEntity<>("parameters", createHeaders(token));
+        ResponseEntity<List<Domain>> response = template.exchange(
+                "/my/management",
+                HttpMethod.GET, entity, new ParameterizedTypeReference<List<Domain>>() {});
+        return response.getBody();
+    }
+
     private HttpHeaders createHeaders(String token){
         return new HttpHeaders() {{
             String authHeader = "Bearer " + token;

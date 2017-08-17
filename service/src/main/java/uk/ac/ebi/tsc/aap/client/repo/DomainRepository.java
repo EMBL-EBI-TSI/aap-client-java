@@ -32,4 +32,11 @@ public interface DomainRepository {
      */
     Collection<Domain> getMyDomains(String token);
 
+    /**
+     * Gets the logged in user management domains
+     * @param token - user token
+     * @return List<Domain></Domain> - management domains
+     */
+    Collection<Domain> getMyManagementDomains(String token);
+
 }
