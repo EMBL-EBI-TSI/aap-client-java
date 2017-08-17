@@ -256,6 +256,49 @@ public class DomainRepositoryRestTest {
 		this.domainsApi.verify();
 	}
 
+	@Test
+	public void should_retrieve_list_of_management_domains_for_logged_in_user(){
+		String mockResponse =
+				" [" +
+						"{" +
+						"  \"domainName\" : \"foo\"," +
+						"  \"domainDesc\" : \"The Foo\"" +
+						"}, " +
+						"{" +
+						"  \"domainName\" : \"bar\"," +
+						"  \"domainDesc\" : \"The Bar\"" +
+						"}" +
+						"]";
+		this.domainsApi.expect(requestTo("/my/management")).andExpect(method(HttpMethod.GET))
+				.andRespond(withSuccess().body(mockResponse).contentType(MediaType.APPLICATION_JSON));
+		Collection<Domain> domains = subject.getMyManagementDomains("a-token");
+		this.domainsApi.verify();
+		assertThat(domains.size(), equalTo(2));
+		assertThat(domains, contains(
+				hasProperty("domainName", equalTo("foo")),
+				hasProperty("domainName", equalTo("bar"))
+		));
+	}
+
+	@Test
+	public void should_retrieve_empty_domains_if_logged_in_user_does_not_have(){
+		String mockResponse = " ["+"]";
+		this.domainsApi.expect(requestTo("/my/management")).andExpect(method(HttpMethod.GET))
+				.andRespond(withSuccess().body(mockResponse).contentType(MediaType.APPLICATION_JSON));
+		Collection<Domain> domains = subject.getMyManagementDomains("a-token");
+		this.domainsApi.verify();
+		assertThat(domains.size(), equalTo(0));
+
+	}
+
+	@Test(expected = RuntimeException.class)
+	public void should_return_server_error_if_something_goes_wrong_while_getting_management_domains(){
+		this.domainsApi.expect(requestTo("/my/management")).andExpect(method(HttpMethod.GET))
+				.andRespond(withServerError());
+		subject.getMyManagementDomains("a-token");
+		this.domainsApi.verify();
+	}
+
 	private User user(String userReference) {
 		return new User(null, null, userReference, null);
 	}
