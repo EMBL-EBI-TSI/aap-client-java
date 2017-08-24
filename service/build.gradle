@@ -1,4 +1,37 @@
+
+buildscript{
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "org.unbroken-dome.gradle-plugins:gradle-testsets-plugin:1.3.2"
+    }
+}
+apply plugin: "org.unbroken-dome.test-sets"
+
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
     compile project(':model')
 }
+
+testSets {
+        integrationTest { dirName = 'integration-test' }
+    }
+
+// Ensure that integration tests are run every time when you invoke this task
+project.integrationTest {
+        outputs.upToDateWhen { false }
+    }
+
+// Ensure that the check task fails the build if there are failing integration tests.
+check.dependsOn integrationTest
+
+// Ensure that our unit tests are run before our integration tests
+integrationTest.mustRunAfter test
+
+// Ensure that the HTML reports of unit and integration tests are written to different directories.
+ tasks.withType(Test) {
+    reports.html.destination = file("${reporting.baseDir}/${name}")
+}
+
+
