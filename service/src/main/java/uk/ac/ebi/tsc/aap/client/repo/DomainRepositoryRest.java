@@ -37,11 +37,12 @@ public class DomainRepositoryRest implements DomainRepository {
 
     @Override
     public Collection<Domain> getDomains(User user, String token) {
+        String userReference = addPrefixToUserReferenceIfNotContains(user.getUserReference());
         HttpEntity<String> entity = new HttpEntity<>("parameters", createHeaders(token));
         ResponseEntity<List<Domain>> response = template.exchange(
                 "/users/{reference}/domains",
                 HttpMethod.GET, entity, new ParameterizedTypeReference<List<Domain>>() {},
-                user.getUserReference());
+                userReference);
         return response.getBody();
     }
 
@@ -56,47 +57,54 @@ public class DomainRepositoryRest implements DomainRepository {
 
     @Override
     public Domain deleteDomain(Domain toDelete, String token) {
+        String domainReference = addPrefixToDomainReferenceIfNotContains(toDelete.getDomainReference());
         HttpEntity<Domain> entity = new HttpEntity<>(toDelete, createHeaders(token));
         ResponseEntity<Domain> response = template.exchange(
                 "/domains/{domainReference}", HttpMethod.DELETE,
-                entity, Domain.class, toDelete.getDomainReference());
+                entity, Domain.class, domainReference);
         return response.getBody();
     }
 
     @Override
     public Domain addUserToDomain(Domain toJoin, User toAdd, String token) {
+        String userReference = addPrefixToUserReferenceIfNotContains(toAdd.getUserReference());
+        String domainReference = addPrefixToDomainReferenceIfNotContains(toJoin.getDomainReference());
         HttpEntity<String> entity = new HttpEntity<>("parameters", createHeaders(token));
         ResponseEntity<Domain> response = template.exchange(
-                "/domains/{dom-reference}/{usr-reference}/user",
-                HttpMethod.PUT, entity, Domain.class, toJoin.getDomainReference(), toAdd.getUserReference());
+                "/domains/{domainReference}/{userReference}/user",
+                HttpMethod.PUT, entity, Domain.class, domainReference, userReference);
         return response.getBody();
     }
     
     @Override
     public Domain getDomainByReference(String reference, String token){
+        String domainReference = addPrefixToDomainReferenceIfNotContains(reference);
     	HttpEntity<String> entity = new HttpEntity<>("parameters", createHeaders(token));
         ResponseEntity<Domain> response = template.exchange(
-                "/domains/dom-{domainReference}",
-                HttpMethod.GET, entity,new ParameterizedTypeReference<Domain>() {}, reference);
+                "/domains/{domainReference}",
+                HttpMethod.GET, entity,new ParameterizedTypeReference<Domain>() {}, domainReference);
         return response.getBody();
     }
     
     @Override
     public Domain removeUserFromDomain(User toBeRemoved, Domain toBeUpdated, String token){
+        String userReference = addPrefixToUserReferenceIfNotContains(toBeRemoved.getUserReference());
+        String domainReference = addPrefixToDomainReferenceIfNotContains(toBeUpdated.getDomainReference());
     	 HttpEntity<User> entity = new HttpEntity<>(toBeRemoved, createHeaders(token));
          ResponseEntity<Domain> response = template.exchange(
-                 "/domains/dom-{domainReference}/usr-{userReference}/user", HttpMethod.DELETE,
-                 entity, Domain.class, toBeUpdated.getDomainReference(), toBeRemoved.getUserReference());
+                 "/domains/{domainReference}/{userReference}/user", HttpMethod.DELETE,
+                 entity, Domain.class, domainReference, userReference);
          return response.getBody();
     }
     
     @Override
     public Collection<User> getAllUsersFromDomain(String domainReference, String token){
+         String reference = addPrefixToDomainReferenceIfNotContains(domainReference);
     	 HttpEntity<?> entity = new HttpEntity<>(createHeaders(token));
     	 ResponseEntity<List<User>> response = template.exchange(
-                 "/domains/dom-{domainReference}/users",
+                 "/domains/{domainReference}/users",
                  HttpMethod.GET, entity, new ParameterizedTypeReference<List<User>>() {},
-                 domainReference);
+                 reference);
          return response.getBody();
     }
 
@@ -134,6 +142,40 @@ public class DomainRepositoryRest implements DomainRepository {
             String authHeader = "Bearer " + token;
             set( "Authorization", authHeader );
         }};
+    }
+
+    /**
+     * This checks for prefix like dom-.Reference not contains corresponding prefix it adds prefix.
+     * If prefix already exist in the reference just ignores to add again.
+     * If Every thing is fine we will remove this backward compatibility code.
+     * @param domainReference
+     * @return String - domain reference
+     */
+    private String addPrefixToDomainReferenceIfNotContains(String domainReference){
+        if(domainReference!=null){
+           if(!domainReference.contains("dom-")){
+               return "dom-"+domainReference;
+           }
+           else return domainReference;
+        }
+        else return domainReference;
+    }
+
+    /**
+     * This checks for prefix like usr-.Reference not contains corresponding prefix it adds prefix.
+     * If prefix already exist in the reference just ignores to add again.
+     * If Every thing is fine we will remove this backward compatibility code.
+     * @param userReference
+     * @return String - user reference
+     */
+    private String addPrefixToUserReferenceIfNotContains(String userReference){
+        if(userReference!=null){
+            if(!userReference.contains("usr-")){
+                return "usr-"+userReference;
+            }
+            else return userReference;
+        }
+        else return userReference;
     }
 
 }
