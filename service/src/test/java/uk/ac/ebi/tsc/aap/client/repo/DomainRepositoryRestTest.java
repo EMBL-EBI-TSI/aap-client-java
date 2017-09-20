@@ -44,7 +44,7 @@ public class DomainRepositoryRestTest {
 	@Test public void
 	retrieves_the_list_of_domain_from_the_api() {
 		String userReference = "foo-bar-buzz";
-		String expectedUrl = String.format("/users/%s/domains", userReference);
+		String expectedUrl = String.format("/users/%s/domains", "usr-"+userReference);
 		String mockResponse =
 				" [" +
 						"{" +
@@ -69,6 +69,36 @@ public class DomainRepositoryRestTest {
 				hasProperty("domainName", equalTo("bar"))
 				));
 	}
+
+	@Test public void
+	can_retrieves_the_list_of_domain_from_the_api_with_prefix() {
+		String userReference = "usr-foo-bar-buzz";
+		String expectedUrl = String.format("/users/%s/domains", userReference);
+		String mockResponse =
+				" [" +
+						"{" +
+						"  \"domainName\" : \"foo\"," +
+						"  \"domainDesc\" : \"The Foo\"" +
+						"}, " +
+						"{" +
+						"  \"domainName\" : \"bar\"," +
+						"  \"domainDesc\" : \"The Bar\"" +
+						"}" +
+						"]";
+		this.domainsApi.expect(requestTo(expectedUrl))
+				.andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
+		User user = user(userReference);
+
+		Collection<Domain> domains = subject.getDomains(user, "a-token");
+
+		this.domainsApi.verify();
+		assertThat(domains.size(), equalTo(2));
+		assertThat(domains, contains(
+				hasProperty("domainName", equalTo("foo")),
+				hasProperty("domainName", equalTo("bar"))
+		));
+	}
+
 
 	@Test public void
 	can_create_a_domain() {
@@ -118,7 +148,7 @@ public class DomainRepositoryRestTest {
 	can_delete_domain() {
 		String domainReference = "foo-bar";
 		Domain toDelete = new Domain(null, null, domainReference);
-		String expectedUrl = String.format("/domains/%s", domainReference);
+		String expectedUrl = String.format("/domains/%s", "dom-"+domainReference);
 		this.domainsApi.expect(requestTo(expectedUrl))
 		.andRespond(withSuccess().body("{\"domainReference\" : \""+domainReference+"\"}").contentType(MediaType.APPLICATION_JSON));
 
@@ -129,10 +159,25 @@ public class DomainRepositoryRestTest {
 	}
 
 	@Test public void
+	can_delete_domain_with_prefixed_reference(){
+		String domainReference = "dom-foo-bar";
+		Domain toDelete = new Domain(null, null, domainReference);
+		String expectedUrl = String.format("/domains/%s", domainReference);
+		this.domainsApi.expect(requestTo(expectedUrl))
+				.andRespond(withSuccess().body("{\"domainReference\" : \""+domainReference+"\"}").contentType(MediaType.APPLICATION_JSON));
+
+		Domain deleted = subject.deleteDomain(toDelete,"a-token");
+
+		this.domainsApi.verify();
+		assertThat(deleted, notNullValue());
+	}
+
+
+	@Test public void
 	can_add_user_to_a_domain() {
 		Domain toJoin = new Domain(null, null, "the-foo");
 		User toAdd = user("the-bar");
-		String expectedUrl = String.format("/domains/%s/%s/user", toJoin.getDomainReference(), toAdd.getUserReference());
+		String expectedUrl = String.format("/domains/%s/%s/user", "dom-"+toJoin.getDomainReference(), "usr-"+toAdd.getUserReference());
 		String mockResponse =
 				"{" +
 						"  \"domainReference\" : \"d7087264-9111-4693-9ea6-233898d91025\"," +
@@ -153,6 +198,33 @@ public class DomainRepositoryRestTest {
 		this.domainsApi.verify();
 		assertThat(updated.getUsers(), notNullValue());
 	}
+
+	@Test public void
+	can_add_user_to_a_domain_with_prefix_reference() {
+		Domain toJoin = new Domain(null, null, "dom-the-foo");
+		User toAdd = user("usr-the-bar");
+		String expectedUrl = String.format("/domains/%s/%s/user", toJoin.getDomainReference(), toAdd.getUserReference());
+		String mockResponse =
+				"{" +
+						"  \"domainReference\" : \"d7087264-9111-4693-9ea6-233898d91025\"," +
+						"  \"adminDomainReference\" : \"c06688f3-1ee8-4a84-b8c3-7ef735f6a18c\"," +
+						"  \"domainName\" : \"Test Test\"," +
+						"  \"domainDesc\" : \"Test Domain\"," +
+						"  \"users\" : [ {" +
+						"    \"userReference\" : \"12845ac8-e71e-45d4-8e85-3dee7d98664e\"," +
+						"    \"userName\" : \"someone\"," +
+						"    \"email\" : \"test@example.com\"" +
+						"  } ]" +
+						"}";
+		this.domainsApi.expect(requestTo(expectedUrl)).andExpect(method(HttpMethod.PUT))
+				.andRespond(withSuccess().body(mockResponse).contentType(MediaType.APPLICATION_JSON));
+
+		Domain updated = subject.addUserToDomain(toJoin, toAdd, "a-token");
+
+		this.domainsApi.verify();
+		assertThat(updated.getUsers(), notNullValue());
+	}
+
 
 	@Test 
 	public void can_get_domain_reference(){
