@@ -28,7 +28,7 @@ import static org.junit.Assert.assertNotNull;
  */
 @EnableAutoConfiguration
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = DomainService.class)
+@SpringBootTest(classes = {DomainService.class,TokenService.class})
 @TestPropertySource(properties = {"aap.domains.url=https://dev.api.aap.tsi.ebi.ac.uk"})
 public class ApplicationIntegrationTest {
     //logger initialised
@@ -37,6 +37,8 @@ public class ApplicationIntegrationTest {
     private static TestRestTemplate testRestTemplate = new TestRestTemplate();
     @Autowired
     private DomainService domainService;
+    @Autowired
+    private TokenService tokenService;
     private static String token;
 
     @BeforeClass
@@ -106,6 +108,14 @@ public class ApplicationIntegrationTest {
         Collection<Domain> myManagementDomains = domainService.getMyManagementDomains(token);
         assertNotNull(myManagementDomains);
         //assertTrue(myManagementDomains.stream().anyMatch(domain -> "self.karo-domain".equals(domain.getDomainName())));
+    }
+
+    @Test
+    public void can_get_a_aap_token_with_username_and_password(){
+        LOGGER.trace("[ApplicationIntegrationTest] - can_get_a_aap_token_with_username_and_password");
+        String response = tokenService.getAAPToken(System.getenv("AAP_TEST_USERNAME"),
+                                                   System.getenv("AAP_TEST_PASSWORD"));
+        assertNotNull("response should not be null..."+response);
     }
 
     private static String getToken(String username, String password) {
