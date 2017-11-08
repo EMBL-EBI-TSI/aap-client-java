@@ -1,8 +1,5 @@
 package uk.ac.ebi.tsc.aap.client.model;
 
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -15,7 +12,6 @@ import java.util.Set;
  */
 public class User implements Serializable, UserDetails {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(User.class);
     private static final long serialVersionUID = 1L;
 
     private String userName;
@@ -26,7 +22,6 @@ public class User implements Serializable, UserDetails {
     public User(){}
 
     public User(String userName, String email, String userReference,Set<Domain> domains) {
-        LOGGER.trace("User instantiation...");
         this.userName = userName;
         this.email = email;
         this.userReference = userReference;
@@ -88,7 +83,6 @@ public class User implements Serializable, UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        LOGGER.trace("returning granted authorities for the user: "+userName);
         return this.domains;}
 
     @Override

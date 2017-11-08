@@ -46,13 +46,14 @@ public class AAPWebSecurityAutoConfiguration {
         private TokenAuthenticationService tokenAuthenticationService;
 
         private StatelessAuthenticationFilter statelessAuthenticationFilterBean() throws Exception {
-            LOGGER.info("this.tokenAuthenticationService: " + this.tokenAuthenticationService);
+            LOGGER.trace("TokenAuthenticationService: {}", this.tokenAuthenticationService);
+            LOGGER.trace("TokenAuthenticationService: {}", this.tokenAuthenticationService);
             return new StatelessAuthenticationFilter(this.tokenAuthenticationService);
         }
 
         @Override
         protected void configure(HttpSecurity httpSecurity) throws Exception {
-            LOGGER.info("[StatelessAuthenticationEntryPoint]- " + unauthorizedHandler);
+            LOGGER.trace("StatelessAuthenticationEntryPoint: {}", unauthorizedHandler);
             httpSecurity
                     // we don't need CSRF because our token is invulnerable
                     .csrf().disable()

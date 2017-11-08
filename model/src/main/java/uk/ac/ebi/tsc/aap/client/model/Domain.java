@@ -1,8 +1,5 @@
 package uk.ac.ebi.tsc.aap.client.model;
 
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.io.Serializable;
@@ -14,7 +11,6 @@ import java.util.Set;
  */
 public class Domain implements Serializable, GrantedAuthority {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Domain.class);
     private static final long serialVersionUID = 1L;
 
     private String domainName;

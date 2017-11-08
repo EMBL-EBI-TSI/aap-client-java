@@ -5,6 +5,7 @@ import org.jose4j.jwt.MalformedClaimException;
 import org.jose4j.jwt.consumer.InvalidJwtException;
 import org.jose4j.jwt.consumer.JwtConsumer;
 import org.jose4j.jwt.consumer.JwtConsumerBuilder;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -30,7 +31,7 @@ import java.util.Set;
 @Component //to support autowire in the API
 public class TokenHandler {
 
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(TokenHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TokenHandler.class);
 
     public JwtConsumer jwtConsumer;
     @Value("${jwt.certificate}")
@@ -71,11 +72,9 @@ public class TokenHandler {
             domains.forEach(name->domainsSet.add(new Domain(name,null,null)));
             return new User(nickname, email, userReference,domainsSet);
         } catch (InvalidJwtException | MalformedClaimException e) {
-            LOGGER.debug("cannot parse token", e);
-            throw new RuntimeException("Cannot parse token", e);
+            throw new RuntimeException("Cannot parse token: "+e.getMessage(), e);
         } catch (Exception e) {
-            LOGGER.info("Exception: " + e.getMessage());
-            throw new RuntimeException("Cannot parse token", e);
+            throw new RuntimeException("Cannot parse token: "+e.getMessage(), e);
         }
     }
 

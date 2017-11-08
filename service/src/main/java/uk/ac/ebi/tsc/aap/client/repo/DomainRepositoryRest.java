@@ -90,26 +90,26 @@ public class DomainRepositoryRest implements DomainRepository {
     public Domain removeUserFromDomain(User toBeRemoved, Domain toBeUpdated, String token){
         String userReference = addPrefixToUserReferenceIfNotContains(toBeRemoved.getUserReference());
         String domainReference = addPrefixToDomainReferenceIfNotContains(toBeUpdated.getDomainReference());
-    	 HttpEntity<User> entity = new HttpEntity<>(toBeRemoved, createHeaders(token));
-         ResponseEntity<Domain> response = template.exchange(
-                 "/domains/{domainReference}/{userReference}/user", HttpMethod.DELETE,
-                 entity, Domain.class, domainReference, userReference);
-         return response.getBody();
+        HttpEntity<User> entity = new HttpEntity<>(toBeRemoved, createHeaders(token));
+        ResponseEntity<Domain> response = template.exchange(
+                "/domains/{domainReference}/{userReference}/user", HttpMethod.DELETE,
+                entity, Domain.class, domainReference, userReference);
+        return response.getBody();
     }
     
     @Override
     public Collection<User> getAllUsersFromDomain(String domainReference, String token){
-         String reference = addPrefixToDomainReferenceIfNotContains(domainReference);
-    	 HttpEntity<?> entity = new HttpEntity<>(createHeaders(token));
-    	 ResponseEntity<List<User>> response = template.exchange(
-                 "/domains/{domainReference}/users",
-                 HttpMethod.GET, entity, new ParameterizedTypeReference<List<User>>() {},
-                 reference);
-         return response.getBody();
+        String reference = addPrefixToDomainReferenceIfNotContains(domainReference);
+        HttpEntity<?> entity = new HttpEntity<>(createHeaders(token));
+        ResponseEntity<List<User>> response = template.exchange(
+                "/domains/{domainReference}/users",
+                HttpMethod.GET, entity, new ParameterizedTypeReference<List<User>>() {},
+                reference);
+        return response.getBody();
     }
 
     /***
-     * Get loggedin user membership domains
+     * Get logged in user membership domains
      * @param token - user token
      * @return list of membership domains
      */
@@ -153,7 +153,7 @@ public class DomainRepositoryRest implements DomainRepository {
      */
     private String addPrefixToDomainReferenceIfNotContains(String domainReference){
         if(domainReference!=null){
-           if(!domainReference.contains("dom-")){
+           if(!domainReference.startsWith("dom-")){
                return "dom-"+domainReference;
            }
            else return domainReference;
@@ -170,7 +170,7 @@ public class DomainRepositoryRest implements DomainRepository {
      */
     private String addPrefixToUserReferenceIfNotContains(String userReference){
         if(userReference!=null){
-            if(!userReference.contains("usr-")){
+            if(!userReference.startsWith("usr-")){
                 return "usr-"+userReference;
             }
             else return userReference;

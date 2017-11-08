@@ -21,7 +21,6 @@ import java.io.IOException;
  */
 public class StatelessAuthenticationFilter extends GenericFilterBean {
 
-    //logger initialised
     public static final Logger LOGGER = LoggerFactory.getLogger
             (StatelessAuthenticationFilter.class);
 
@@ -30,8 +29,8 @@ public class StatelessAuthenticationFilter extends GenericFilterBean {
     public StatelessAuthenticationFilter(
             TokenAuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
-        LOGGER.trace("[StatelessAuthenticationFilter]-authenticationService " +
-                ""+authenticationService);
+        LOGGER.trace("AuthenticationService: {}",
+                authenticationService);
     }
 
     @Override

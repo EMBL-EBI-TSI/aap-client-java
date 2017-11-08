@@ -31,16 +31,16 @@ public class TokenAuthenticationService {
     }
 
     public Authentication getAuthentication(HttpServletRequest request){
-        LOGGER.debug("In the[TokenAuthenticationService] - getAuthentication");
+        LOGGER.trace("getAuthentication");
         try {
             final String token = extractToken(request);
             if (token == null) return null;
             User user = tokenHandler.parseUserFromToken(token);
             return new UserAuthentication(user);
         }
-        catch (Exception e) {
+        catch(Exception e) {
             LOGGER.error(e.getMessage());
-            LOGGER.trace("", e);
+            LOGGER.debug("Cannot extract authentication details from token", e);
             return null;
         }
 
