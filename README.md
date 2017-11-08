@@ -38,6 +38,7 @@ signing.keyId=1A2B3C4D
 signing.password=changeme
 signing.secretKeyRingFile=path/to/secring.gpg
 ```
+*Note* the long SHA does not seem to work (at least on windows), so use  `$ gpg --list-secret-keys` instead, and what you need in `keyId` is what's in `sec` after the `/`.
 
 It is also necessary to have defined the following variables (even if you are not using the uploadArchive task):
 ```
