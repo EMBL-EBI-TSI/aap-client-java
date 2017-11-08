@@ -16,7 +16,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.tsc.aap.client.model.Domain;
 import uk.ac.ebi.tsc.aap.client.model.User;
 
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -60,10 +62,11 @@ public class ApplicationIntegrationTest {
     @Test
     public void can_create_a_domain_and_delete_the_domain() {
         LOGGER.trace("[ApplicationIntegrationTest] - can_create_a_domain_and_delete_the_domain");
-        Domain created = domainService.createDomain("Iam not client", "describe me", token);
+        String uniqueName = "Iam not client "+ new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(new Date());
+        Domain created = domainService.createDomain(uniqueName, "aap client java integration test", token);
         assertNotNull(created);
         Domain deleted = domainService.deleteDomain(created, token);
-        assertNotNull("-delete status: " + deleted);
+        assertNotNull(deleted);
     }
 
     @Test
@@ -115,7 +118,7 @@ public class ApplicationIntegrationTest {
         LOGGER.trace("[ApplicationIntegrationTest] - can_get_a_aap_token_with_username_and_password");
         String response = tokenService.getAAPToken(System.getenv("AAP_TEST_USERNAME"),
                                                    System.getenv("AAP_TEST_PASSWORD"));
-        assertNotNull("response should not be null..."+response);
+        assertNotNull(response);
     }
 
     private static String getToken(String username, String password) {
