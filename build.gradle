@@ -9,6 +9,7 @@ buildscript {
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion")
+        classpath("pl.allegro.tech.build:axion-release-plugin:1.8.1")
     }
 }
 
@@ -19,9 +20,15 @@ subprojects {
     apply plugin: 'maven-publish'
     apply plugin: 'maven'
     apply plugin: 'signing'
+    apply plugin: 'pl.allegro.tech.build.axion-release'
 
     group = 'uk.ac.ebi.tsc.aap.client'
-    version = '0.2.2-SNAPSHOT'
+    scmVersion {
+        tag {
+            prefix = 'aap' // this must be followed by a - in the actual tags
+        }
+    }
+    version = scmVersion.version
 
     repositories {
         maven { url "https://oss.sonatype.org/content/groups/public" }
