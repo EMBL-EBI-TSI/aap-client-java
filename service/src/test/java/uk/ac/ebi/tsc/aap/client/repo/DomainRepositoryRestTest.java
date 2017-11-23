@@ -372,6 +372,6 @@ public class DomainRepositoryRestTest {
 	}
 
 	private User user(String userReference) {
-		return new User(null, null, userReference, null, null);
+		return new User(null, null, userReference, null);
 	}
 }

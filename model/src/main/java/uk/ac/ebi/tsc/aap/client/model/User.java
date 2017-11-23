@@ -17,16 +17,14 @@ public class User implements Serializable, UserDetails {
     private String userName;
     private String email;
     private String userReference;
-    private String fullName;
     private Set<Domain> domains;
 
     public User(){}
 
-    public User(String userName, String email, String userReference, String fullName, Set<Domain> domains) {
+    public User(String userName, String email, String userReference,Set<Domain> domains) {
         this.userName = userName;
         this.email = email;
         this.userReference = userReference;
-        this.fullName = fullName;
         this.domains = domains;
     }
 
@@ -52,10 +50,6 @@ public class User implements Serializable, UserDetails {
 
     public void setUserReference(String userReference) {
         this.userReference = userReference;
-    }
-
-    public String getFullName() {
-        return fullName;
     }
 
     public void setDomains(Set<Domain> domains) {

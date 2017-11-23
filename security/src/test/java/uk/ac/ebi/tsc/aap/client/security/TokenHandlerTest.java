@@ -44,17 +44,6 @@ public class TokenHandlerTest {
     }
 
     @Test public void
-    extracts_user_full_name_from_token() throws Exception {
-        JwtClaims claims = minClaims();
-        claims.setClaim("name", "Alice Wonderland");
-        String validToken = JWTHelper.build(claims, signingKey, AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256);
-
-        User user = subject.parseUserFromToken(validToken);
-
-        assertThat(user.getFullName()).isEqualTo("Alice Wonderland");
-    }
-
-    @Test public void
     detects_tampered_token() throws Exception {
         String validToken = JWTHelper.token();
         String encodedPayload = validToken.split("\\.")[1];
@@ -98,23 +87,14 @@ public class TokenHandlerTest {
     }
 
     private String expiredToken() {
-        // past must be earlier than skew allowed by TokenHandler jwtConsumer
-        long past = - (60 * 1000);
-        JwtClaims claims = minClaims(past);
-        return JWTHelper.build(claims, signingKey, AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256);
-    }
-
-    private JwtClaims minClaims() {
-        return minClaims(2 * 1000);
-    }
-
-    private JwtClaims minClaims(long expiresIn) {
         long now = new Date().getTime();
-        NumericDate expiry = NumericDate.fromMilliseconds(now + expiresIn);
+        // past must be earlier than skew allowed by TokenHandler jwtConsumer
+        NumericDate past = NumericDate.fromMilliseconds(now - (60 * 1000));
+
         JwtClaims claims = new JwtClaims();
         claims.setSubject(username);
-        claims.setExpirationTime( expiry);
-        return claims;
+        claims.setExpirationTime(past);
+        return JWTHelper.build(claims, signingKey, AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256);
     }
 
 
