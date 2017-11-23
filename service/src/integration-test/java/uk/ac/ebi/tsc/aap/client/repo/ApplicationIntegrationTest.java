@@ -130,6 +130,6 @@ public class ApplicationIntegrationTest {
     }
 
     private User user(String userReference) {
-        return new User(null, null, userReference, null);
+        return new User(null, null, userReference, null, null);
     }
 }
