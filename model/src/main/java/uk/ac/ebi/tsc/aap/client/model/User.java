@@ -4,7 +4,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -123,5 +125,46 @@ public class User implements Serializable, UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public static class Builder {
+
+        private User user;
+
+        public Builder(String reference) {
+            user = new User();
+            user.setUserReference(reference);
+        }
+
+        public Builder withUsername(String username) {
+            user.setUserName(username);
+            return this;
+        }
+
+        public Builder withEmail(String email) {
+            user.setEmail(email);
+            return this;
+        }
+
+        public Builder withFullName(String name) {
+            user.setFullName(name);
+            return this;
+        }
+
+        public Builder withDomains(Set<Domain> domains) {
+            user.setDomains(domains);
+            return this;
+        }
+
+        public Builder withDomains(String... domains) {
+            Set<Domain> domainsSet = new HashSet<>();
+            Arrays.asList(domains).forEach(name->domainsSet.add(new Domain(name,null,null)));
+            user.setDomains(domainsSet);
+            return this;
+        }
+
+        public User build() {
+            return user;
+        }
     }
 }

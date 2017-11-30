@@ -7,18 +7,18 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.Assert.assertThat;
 
-public class UserBuilderTest {
+public class UserTest {
 
     @Test public void
     can_build_minimalist_user() {
-        UserBuilder subject = new UserBuilder("foo");
+        User.Builder subject = new User.Builder("foo");
         User actual = subject.build();
         assertThat(actual.getUserReference(), equalTo("foo"));
     }
 
     @Test public void
     can_build_user_with_domain_names() {
-        UserBuilder subject = new UserBuilder("anything");
+        User.Builder subject = new User.Builder("anything");
         subject.withDomains("one", "two");
 
         User actual = subject.build();
