@@ -25,6 +25,16 @@ dependencies {
 
 Use the provided classes to secure your API: more to come on this section soon!
 
+### Configure which AAP environment to talk to
+
+By default, the client uses our 'explore' environment, which we use as a sandbox for other parties integrating with us.
+To switch to another environment (for example, production):
+  - Download the certificate from the environment:
+https://api.aai.ebi.ac.uk/meta/public.der, and bundle that in your resources
+  - Add the following properties (for ex, in your main application.properties):
+    * `aap.domains.url` to https://api.aai.ebi.ac.uk
+    * `jwt.certificate` to the path/to/the/public/certificate.der 
+
 ### Prerequisites
 
 We are using this library with a few spring-boot applications, and anything with spring-security/spring-web
@@ -50,7 +60,6 @@ ossrhPassword=secret
 
 * Download [Gradle](https://gradle.org/gradle-download/) (if you haven't already got it...)
 * Checkout the [source code](https://github.com/EMBL-EBI-TSI/aap-client-java.git)
-*
 
 To come next: getting a JWT from the AAP, and using it to check which domain a given user is part of.
 
