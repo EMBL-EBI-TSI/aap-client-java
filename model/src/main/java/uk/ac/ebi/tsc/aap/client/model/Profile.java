@@ -1,5 +1,7 @@
 package uk.ac.ebi.tsc.aap.client.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -33,8 +35,13 @@ public class Profile {
         return attributes.get(name);
     }
 
+    @JsonIgnore
     public Set<String> getAttributeNames() {
         return attributes.keySet();
+    }
+
+    public Map<String,String> getAttributes() {
+        return attributes;
     }
 
     public static class Builder {
