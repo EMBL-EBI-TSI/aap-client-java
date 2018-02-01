@@ -22,6 +22,7 @@ import java.util.Date;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertNotNull;
 
@@ -45,9 +46,11 @@ public class ApplicationIntegrationTest {
 
     @BeforeClass
     public static void setUp() {
-        token = getToken(System.getenv("AAP_TEST_USERNAME"),
-                         System.getenv("AAP_TEST_PASSWORD")
-        );
+        String username = System.getenv("AAP_TEST_USERNAME");
+        String password = System.getenv("AAP_TEST_PASSWORD");
+        assertThat("Missing environment variable AAP_TEST_USERNAME", username, notNullValue());
+        assertThat("Missing environment variable AAP_TEST_PASSWORD", password, notNullValue());
+        token = getToken(username, password);
     }
 
     @Test
