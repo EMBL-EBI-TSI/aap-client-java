@@ -225,6 +225,7 @@ public class DomainRepositoryRestTest {
 
 		this.domainsApi.verify();
 		assertThat(updated.getManagers(), notNullValue());
+		assertThat(updated.getManagers().iterator().next().getUserReference(),equalTo("usr-the-bar"));
 	}
 
 	@Test public void
@@ -279,45 +280,43 @@ public class DomainRepositoryRestTest {
 	@Test
 	public void can_delete_user_from_domain(){
 		
-		Domain toJoin = new Domain(null, null, "the-foo");
-		User toAdd = user("the-bar");
+		Domain toLeave = new Domain(null, null, "the-foo");
+		User toDelete = user("the-bar");
 		
 		String mockResponse = "{\n  \"domainReference\" : \"f15266eb-0f76-4e75-9b9f-f9689f8c06b8\",\n "
 				+ " \"adminDomainReference\" : \"7760cc46-4c27-4c36-aefc-478ba06e774a\",\n  "
 				+ "\"domainName\" : \"self.TEAM_domain_test_PORTAL\",\n "
 				+ " \"domainDesc\" : \"Domain TEAM_domain_test_PORTAL created\",\n  \"users\" : [ ],\n  \"managers\" : null\n}";
 				
-		String expectedUrl = String.format("/domains/dom-%s/usr-%s/user",  toJoin.getDomainReference(), toAdd.getUserReference());
+		String expectedUrl = String.format("/domains/dom-%s/usr-%s/user",  toLeave.getDomainReference(), toDelete.getUserReference());
 		
 		this.domainsApi.expect(requestTo(expectedUrl)).andExpect(method(HttpMethod.DELETE))
 		.andRespond(withSuccess().body(mockResponse).contentType(MediaType.APPLICATION_JSON));
 		
-		toJoin = subject.removeUserFromDomain(toAdd, toJoin, "token");
+		toLeave = subject.removeUserFromDomain(toDelete, toLeave, "token");
 		this.domainsApi.verify();
 		
-		assertThat(toJoin.getUsers().size(), is(0));
+		assertThat(toLeave.getUsers().size(), is(0));
 	}
 
 	@Test
 	public void can_delete_manager_from_domain(){
 
-		Domain toJoin = new Domain(null, null, "the-foo");
-		User toAdd = user("the-bar");
+		Domain toLeave = new Domain(null, null, "the-foo");
+		User toDelete = user("the-bar");
 
 		String mockResponse = "{\n  \"domainReference\" : \"f15266eb-0f76-4e75-9b9f-f9689f8c06b8\",\n "
 				+ " \"adminDomainReference\" : \"7760cc46-4c27-4c36-aefc-478ba06e774a\",\n  "
 				+ "\"domainName\" : \"self.TEAM_domain_test_PORTAL\",\n "
 				+ " \"domainDesc\" : \"Domain TEAM_domain_test_PORTAL created\",\n  \"users\" : [ ],\n  \"managers\" : [ ]\n}";
 
-		String expectedUrl = String.format("/domains/dom-%s/managers/usr-%s",  toJoin.getDomainReference(), toAdd.getUserReference());
+		String expectedUrl = String.format("/domains/dom-%s/managers/usr-%s",  toLeave.getDomainReference(), toDelete.getUserReference());
 
 		this.domainsApi.expect(requestTo(expectedUrl)).andExpect(method(HttpMethod.DELETE))
 				.andRespond(withSuccess().body(mockResponse).contentType(MediaType.APPLICATION_JSON));
 
-		toJoin = subject.removeManagerFromDomain(toAdd, toJoin, "token");
+		subject.removeManagerFromDomain(toDelete, toLeave, "token");
 		this.domainsApi.verify();
-
-		assertThat(toJoin.getManagers().size(), is(0));
 	}
 	
 	@Test
