@@ -75,6 +75,17 @@ public class DomainRepositoryRest implements DomainRepository {
                 HttpMethod.PUT, entity, Domain.class, domainReference, userReference);
         return response.getBody();
     }
+
+    @Override
+    public Domain addManagerToDomain(Domain toJoin, User toAdd, String token) {
+        String userReference = addPrefixToUserReferenceIfNotContains(toAdd.getUserReference());
+        String domainReference = addPrefixToDomainReferenceIfNotContains(toJoin.getDomainReference());
+        HttpEntity<String> entity = new HttpEntity<>("parameters", createHeaders(token));
+        ResponseEntity<Domain> response = template.exchange(
+                "/domains/{domainReference}/managers/{userReference}",
+                HttpMethod.PUT, entity, Domain.class, domainReference, userReference);
+        return response.getBody();
+    }
     
     @Override
     public Domain getDomainByReference(String reference, String token){
@@ -96,6 +107,17 @@ public class DomainRepositoryRest implements DomainRepository {
                 entity, Domain.class, domainReference, userReference);
         return response.getBody();
     }
+
+    @Override
+    public Domain removeManagerFromDomain(User toBeRemoved, Domain toBeUpdated, String token){
+        String userReference = addPrefixToUserReferenceIfNotContains(toBeRemoved.getUserReference());
+        String domainReference = addPrefixToDomainReferenceIfNotContains(toBeUpdated.getDomainReference());
+        HttpEntity<User> entity = new HttpEntity<>(toBeRemoved, createHeaders(token));
+        ResponseEntity<Domain> response = template.exchange(
+                "/domains/{domainReference}/managers/{userReference}", HttpMethod.DELETE,
+                entity, Domain.class, domainReference, userReference);
+        return response.getBody();
+    }
     
     @Override
     public Collection<User> getAllUsersFromDomain(String domainReference, String token){
@@ -103,6 +125,17 @@ public class DomainRepositoryRest implements DomainRepository {
         HttpEntity<?> entity = new HttpEntity<>(createHeaders(token));
         ResponseEntity<List<User>> response = template.exchange(
                 "/domains/{domainReference}/users",
+                HttpMethod.GET, entity, new ParameterizedTypeReference<List<User>>() {},
+                reference);
+        return response.getBody();
+    }
+
+    @Override
+    public Collection<User> getAllManagersFromDomain(String domainReference, String token){
+        String reference = addPrefixToDomainReferenceIfNotContains(domainReference);
+        HttpEntity<?> entity = new HttpEntity<>(createHeaders(token));
+        ResponseEntity<List<User>> response = template.exchange(
+                "/domains/{domainReference}/managers",
                 HttpMethod.GET, entity, new ParameterizedTypeReference<List<User>>() {},
                 reference);
         return response.getBody();
