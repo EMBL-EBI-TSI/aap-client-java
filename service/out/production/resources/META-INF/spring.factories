@@ -1,3 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=uk.ac.ebi.tsc.aap.client.repo.DomainService,\
-  uk.ac.ebi.tsc.aap.client.repo.DomainRepositoryRest,uk.ac.ebi.tsc.aap.client.repo.TokenService,\
-  uk.ac.ebi.tsc.aap.client.repo.TokenRepositoryRest
