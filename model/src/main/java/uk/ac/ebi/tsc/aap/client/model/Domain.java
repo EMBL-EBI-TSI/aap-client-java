@@ -18,6 +18,7 @@ public class Domain implements Serializable, GrantedAuthority {
     private String domainReference;
 
     private Set<User> users = new HashSet<>();
+    private Set<User> managers = new HashSet<>();
 
     public Domain() {
     }
@@ -55,6 +56,8 @@ public class Domain implements Serializable, GrantedAuthority {
     public Set<User> getUsers() {
         return users;
     }
+
+    public Set<User> getManagers() {return managers;}
 
     @Override
     public String toString() {

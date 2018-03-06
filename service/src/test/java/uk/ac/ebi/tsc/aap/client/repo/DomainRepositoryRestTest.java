@@ -200,6 +200,34 @@ public class DomainRepositoryRestTest {
 	}
 
 	@Test public void
+	can_add_user_to_domain_managers(){
+		Domain toJoin = new Domain(null, null, "dom-the-foo");
+		User toAdd = user("usr-the-bar");
+		String expectedUrl = String.format("/domains/%s/managers/%s", toJoin.getDomainReference(), toAdd.getUserReference());
+		String mockResponse = "{\n" +
+				"  \"domainReference\": \"dom-the-foo\",\n" +
+				"  \"domainName\": \"self.foo\",\n" +
+				"  \"domainDesc\": \"The Foo\",\n" +
+				"  \"users\": [],\n" +
+				"  \"managers\": [\n" +
+				"    {\n" +
+				"      \"userName\": \"karo\",\n" +
+				"      \"domains\": null,\n" +
+				"      \"userReference\": \"usr-the-bar\"\n" +
+				"    }\n" +
+				"  ]\n" +
+				"}";
+
+		this.domainsApi.expect(requestTo(expectedUrl)).andExpect(method(HttpMethod.PUT))
+				.andRespond(withSuccess().body(mockResponse).contentType(MediaType.APPLICATION_JSON));
+
+		Domain updated = subject.addManagerToDomain(toJoin, toAdd, "a-token");
+
+		this.domainsApi.verify();
+		assertThat(updated.getManagers(), notNullValue());
+	}
+
+	@Test public void
 	can_add_user_to_a_domain_with_prefix_reference() {
 		Domain toJoin = new Domain(null, null, "dom-the-foo");
 		User toAdd = user("usr-the-bar");
@@ -269,6 +297,28 @@ public class DomainRepositoryRestTest {
 		
 		assertThat(toJoin.getUsers().size(), is(0));
 	}
+
+	@Test
+	public void can_delete_manager_from_domain(){
+
+		Domain toJoin = new Domain(null, null, "the-foo");
+		User toAdd = user("the-bar");
+
+		String mockResponse = "{\n  \"domainReference\" : \"f15266eb-0f76-4e75-9b9f-f9689f8c06b8\",\n "
+				+ " \"adminDomainReference\" : \"7760cc46-4c27-4c36-aefc-478ba06e774a\",\n  "
+				+ "\"domainName\" : \"self.TEAM_domain_test_PORTAL\",\n "
+				+ " \"domainDesc\" : \"Domain TEAM_domain_test_PORTAL created\",\n  \"users\" : [ ],\n  \"managers\" : [ ]\n}";
+
+		String expectedUrl = String.format("/domains/dom-%s/managers/usr-%s",  toJoin.getDomainReference(), toAdd.getUserReference());
+
+		this.domainsApi.expect(requestTo(expectedUrl)).andExpect(method(HttpMethod.DELETE))
+				.andRespond(withSuccess().body(mockResponse).contentType(MediaType.APPLICATION_JSON));
+
+		toJoin = subject.removeManagerFromDomain(toAdd, toJoin, "token");
+		this.domainsApi.verify();
+
+		assertThat(toJoin.getManagers().size(), is(0));
+	}
 	
 	@Test
 	public void can_get_list_of_users_for_domain(){
@@ -293,6 +343,31 @@ public class DomainRepositoryRestTest {
 		
 		assertThat(users.size(), is(1));
 		
+	}
+
+	@Test
+	public void can_get_list_of_managers_for_domain(){
+
+		String domainReference = "domainReference";
+
+		String mockResponse = "[ {\n  \"userReference\" : \"57d94c6d-565c-46b8-aabe-49c9461fc707\",\n "
+				+ " \"userName\" : \"946838e27f8831afd866ff6f66ad37f075626ae3\",\n  \"email\" :"
+				+ " \"navispretheeba@gmail.com\",\n  \"mobile\" : null,\n  \"domains\" : null,\n  "
+				+ "\"links\" : [ {\n    \"rel\" : \"self\",\n   "
+				+ " \"href\" : \"https://dev.api.aap.tsi.ebi.ac.uk/users/usr-57d94c6d-565c-46b8-aabe-49c9461fc707\"\n  } ]\n} ]";
+
+		String expectedUrl = String.format("/domains/dom-%s/managers", domainReference);
+
+		this.domainsApi.expect(requestTo(expectedUrl)).andExpect(method(HttpMethod.GET))
+				.andRespond(withSuccess().body(mockResponse).contentType(MediaType.APPLICATION_JSON));
+
+
+		Collection<User> users = subject.getAllManagersFromDomain(domainReference, "token");
+
+		this.domainsApi.verify();
+
+		assertThat(users.size(), is(1));
+
 	}
 
 	@Test

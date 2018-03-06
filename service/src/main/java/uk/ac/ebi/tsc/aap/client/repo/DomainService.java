@@ -51,6 +51,18 @@ public class DomainService {
     	return repo.getAllUsersFromDomain(domainReference, token);
     }
 
+    public Domain addManagerToDomain(Domain toJoin, User toAdd, String token){
+        return repo.addManagerToDomain(toJoin, toAdd, token);
+    }
+
+    public Domain removeManagerFromDomain(User toBeRemoved, Domain toBeUpdated, String token){
+        return repo.removeManagerFromDomain(toBeRemoved, toBeUpdated, token);
+    }
+
+    public Collection<User> getAllManagersFromDomain(String domainReference, String token){
+        return repo.getAllManagersFromDomain(domainReference, token);
+    }
+
     /**
      * Gets the current user membership domains
      * @param token - user token

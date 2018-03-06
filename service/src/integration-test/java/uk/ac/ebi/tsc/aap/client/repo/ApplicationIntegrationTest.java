@@ -94,10 +94,29 @@ public class ApplicationIntegrationTest {
     }
 
     @Test
+    public void can_add_manager_to_a_domain() {
+        LOGGER.trace("[ApplicationIntegrationTest] - can_add_manager_to_a_domain-"+token);
+        Domain domain = new Domain(null, null, "dom-0a22160b-563c-45a1-b497-9bff5b69a204");
+        User user = user("usr-cebc0e02-24e1-40a6-b0a5-75c10ddffb86");
+        Domain result = domainService.addManagerToDomain(domain, user, token);
+        assertNotNull(result);
+        Domain deletedResult = domainService.removeManagerFromDomain(user,domain,token);
+        assertNotNull(deletedResult);
+    }
+
+    @Test
     public void can_get_all_users_from_domain() {
-        LOGGER.trace("[ApplicationIntegrationTest] - can_add_user_to_a_domain");
+        LOGGER.trace("[ApplicationIntegrationTest] - can_get_all_users_from_a_domain");
         String domainReference = "dom-0a22160b-563c-45a1-b497-9bff5b69a204";
         Collection<User> users = domainService.getAllUsersFromDomain(domainReference, token);
+        assertNotNull(users);
+    }
+
+    @Test
+    public void can_get_all_managers_from_domain() {
+        LOGGER.trace("[ApplicationIntegrationTest] - can_get_all_managers_from_a_domain");
+        String domainReference = "dom-0a22160b-563c-45a1-b497-9bff5b69a204";
+        Collection<User> users = domainService.getAllManagersFromDomain(domainReference, token);
         assertNotNull(users);
     }
 
