@@ -16,6 +16,7 @@ apply plugin: "org.unbroken-dome.test-sets"
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
     compile project(':model')
+    compile("com.auth0:java-jwt:3.2.0")
     testCompile("org.springframework.restdocs:spring-restdocs-core:${restDocsVersion}")
     testCompile("org.springframework.restdocs:spring-restdocs-mockmvc:${restDocsVersion}")
 }
