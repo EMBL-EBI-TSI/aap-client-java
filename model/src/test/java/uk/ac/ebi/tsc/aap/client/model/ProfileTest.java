@@ -75,9 +75,9 @@ public class ProfileTest {
     @Test public void
     can_build_profile_with_domain() {
         Profile profile = new Profile.Builder()
-                .withDomain("domRef")
+                .withDomain("domRefe")
                 .build();
-        assertThat(profile.getDomain().getDomainReference(), is("domRef"));
+        assertThat(profile.getDomain().getDomainReference(), is("domRefe"));
     }
 
     @Test public void
