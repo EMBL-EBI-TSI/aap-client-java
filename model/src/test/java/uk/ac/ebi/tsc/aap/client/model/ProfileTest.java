@@ -4,8 +4,10 @@ import org.junit.Test;
 
 import java.util.Map;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 public class ProfileTest {
@@ -52,4 +54,37 @@ public class ProfileTest {
         assertThat(attributes.get("two"), equalTo("deux"));
     }
 
+    @Test public void
+    is_empty_user_reference_ignored() {
+        String userReference = null;
+        Profile profile = new Profile.Builder()
+                .withUser(userReference)
+                .build();
+        assertNull(profile.getUser());
+    }
+
+    @Test public void
+    is_empty_domain_reference_ignored() {
+        String domainReference = null;
+        Profile profile = new Profile.Builder()
+                .withDomain(domainReference)
+                .build();
+        assertNull(profile.getDomain());
+    }
+
+    @Test public void
+    can_build_profile_with_domain() {
+        Profile profile = new Profile.Builder()
+                .withDomain("domRef")
+                .build();
+        assertThat(profile.getDomain().getDomainReference(), is("domRef"));
+    }
+
+    @Test public void
+    can_build_profile_without_reference() {
+        Profile profile = new Profile.Builder()
+                .withUser("abc")
+                .build();
+        assertNull(profile.getReference());
+    }
 }

@@ -23,6 +23,10 @@ public class Domain implements Serializable, GrantedAuthority {
     public Domain() {
     }
 
+    public Domain(String domainReference) {
+        this(null, null, domainReference);
+    }
+
     public Domain(String domainName, String domainDesc, String domainReference) {
         this.domainName = domainName;
         this.domainDesc = domainDesc;

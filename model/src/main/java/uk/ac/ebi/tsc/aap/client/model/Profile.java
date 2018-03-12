@@ -1,6 +1,7 @@
 package uk.ac.ebi.tsc.aap.client.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,13 +14,15 @@ public class Profile {
 
     private String reference;
     private User user;
+    private Domain domain;
     private Map<String, String> attributes = new HashMap<>();
 
     private Profile() {}
 
-    public Profile(String reference, User user, Map<String, String> attributes) {
+    public Profile(String reference, User user, Domain domain, Map<String, String> attributes) {
         this.reference = reference;
         this.user = user;
+        this.domain = domain;
         this.attributes = attributes;
     }
 
@@ -27,8 +30,14 @@ public class Profile {
         return reference;
     }
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public User getUser() {
         return user;
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public Domain getDomain() {
+        return domain;
     }
 
     public String getAttribute(String name) {
@@ -44,12 +53,31 @@ public class Profile {
         return attributes;
     }
 
+    @JsonIgnore
+    public String getDomainReference() {
+        return this.domain != null ?  this.domain.getDomainReference() : null;
+    }
+
+    @JsonIgnore
+    public String getUserReference() {
+        return this.user != null ? this.user.getUserReference() : null;
+    }
+
     public static class Builder {
         Profile profile;
+
+        public Builder() {
+            profile = new Profile();
+        }
 
         public Builder(String reference) {
             profile = new Profile();
             profile.reference = reference;
+        }
+
+        public Builder withReference(String reference) {
+            profile.reference = reference;
+            return this;
         }
 
         public Builder withUser(User user) {
@@ -58,7 +86,16 @@ public class Profile {
         }
 
         public Builder withUser(String userReference) {
-            profile.user = new User.Builder(userReference).build();
+            if (userReference != null) {
+                profile.user = new User.Builder(userReference).build();
+            }
+            return this;
+        }
+
+        public Builder withDomain(String domainReference) {
+            if (domainReference != null) {
+                profile.domain = new Domain(domainReference);
+            }
             return this;
         }
 
