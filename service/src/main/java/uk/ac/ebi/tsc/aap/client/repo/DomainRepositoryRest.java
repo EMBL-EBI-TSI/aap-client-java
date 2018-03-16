@@ -15,6 +15,8 @@ import uk.ac.ebi.tsc.aap.client.model.User;
 import java.util.Collection;
 import java.util.List;
 
+import static uk.ac.ebi.tsc.aap.client.util.TokenHeaderBuilder.createHeaders;
+
 /**
  * @author Amelie Cornelis <ameliec@ebi.ac.uk>
  * @since v0.0.1
@@ -170,12 +172,7 @@ public class DomainRepositoryRest implements DomainRepository {
         return response.getBody();
     }
 
-    private HttpHeaders createHeaders(String token){
-        return new HttpHeaders() {{
-            String authHeader = "Bearer " + token;
-            set( "Authorization", authHeader );
-        }};
-    }
+
 
     /**
      * This checks for prefix like dom-.Reference not contains corresponding prefix it adds prefix.

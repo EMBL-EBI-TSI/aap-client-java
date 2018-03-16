@@ -1,5 +1,7 @@
 package uk.ac.ebi.tsc.aap.client.repo;
 
+import com.google.common.collect.ImmutableMap;
+import org.hamcrest.collection.IsMapContaining;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,7 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.client.HttpClientErrorException;
 import uk.ac.ebi.tsc.aap.client.model.Domain;
+import uk.ac.ebi.tsc.aap.client.model.Profile;
 import uk.ac.ebi.tsc.aap.client.model.User;
 
 import java.text.SimpleDateFormat;
@@ -31,8 +35,9 @@ import static org.junit.Assert.assertNotNull;
  */
 @EnableAutoConfiguration
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {DomainService.class,TokenService.class})
-@TestPropertySource(properties = {"aap.domains.url=https://dev.api.aap.tsi.ebi.ac.uk"})
+@SpringBootTest(classes = {DomainService.class,TokenService.class, ProfileService.class})
+@TestPropertySource(properties = {"aap.domains.url=https://dev.api.aap.tsi.ebi.ac.uk",
+        "aap.profiles.url=https://dev.api.aap.tsi.ebi.ac.uk"})
 public class ApplicationIntegrationTest {
     //logger initialised
     private static final Logger LOGGER = LoggerFactory.getLogger
@@ -40,16 +45,26 @@ public class ApplicationIntegrationTest {
     private static TestRestTemplate testRestTemplate = new TestRestTemplate();
     @Autowired
     private DomainService domainService;
+
+    @Autowired
+    private ProfileService profileService;
+
     @Autowired
     private TokenService tokenService;
     private static String token;
+    private static String AJAY_USERNAME;
+    private static String AJAY_PASSWORD;
 
     @BeforeClass
     public static void setUp() {
         String username = System.getenv("AAP_TEST_USERNAME");
         String password = System.getenv("AAP_TEST_PASSWORD");
+        AJAY_USERNAME = System.getenv("AAP_AJAY_USERNAME");
+        AJAY_PASSWORD = System.getenv("AAP_AJAY_PASSWORD");
         assertThat("Missing environment variable AAP_TEST_USERNAME", username, notNullValue());
         assertThat("Missing environment variable AAP_TEST_PASSWORD", password, notNullValue());
+        assertThat("Missing environment variable AAP_AJAY_USERNAME", AJAY_USERNAME, notNullValue());
+        assertThat("Missing environment variable AAP_AJAY_PASSWORD", AJAY_PASSWORD, notNullValue());
         token = getToken(username, password);
     }
 
@@ -73,6 +88,49 @@ public class ApplicationIntegrationTest {
     }
 
     @Test
+    public void can_create_domain_profile() {
+        LOGGER.trace("[ApplicationIntegrationTest] - can_create_domain_profile");
+        String uniqueName = "Profile creation test "+ new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(new Date());
+        Domain created = domainService.createDomain(uniqueName, "aap client java integration test", token);
+        assertNotNull(created);
+        Profile profile = profileService.createDomainProfile(created.getDomainReference(), ImmutableMap.of("colour", "blue", "fruit", "pineapple"), token);
+        assertThat(profile.getDomainReference(), is(created.getDomainReference()));
+        assertThat(profile.getAttributeNames().size(), is(2));
+        assertThat(profile.getAttributes(), IsMapContaining.hasEntry("fruit", "pineapple"));
+        Domain deleted = domainService.deleteDomain(created, token);
+        assertNotNull(deleted);
+    }
+
+    @Test
+    public void can_change_domain_profile() {
+        String uniqueName = "Profile modification test "+ new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(new Date());
+        Domain created = domainService.createDomain(uniqueName, "aap client java integration test", token);
+        assertNotNull(created);
+        Profile profile = profileService.createDomainProfile(created.getDomainReference(), ImmutableMap.of("colour", "blue", "fruit", "pineapple"), token);
+        assertThat(profile.getDomainReference(), is(created.getDomainReference()));
+        assertThat(profile.getAttributeNames().size(), is(2));
+        assertThat(profile.getAttributes(), IsMapContaining.hasEntry("fruit", "pineapple"));
+        profile = profileService.updateProfile(profile.getReference(), ImmutableMap.of("car", "Volvo"), token);
+        assertThat(profile.getDomainReference(), is(created.getDomainReference()));
+        assertThat(profile.getAttributeNames().size(), is(1));
+        assertThat(profile.getAttributes(), IsMapContaining.hasEntry("car", "Volvo"));
+        /* seems PATCH is not exposed..TODO - check, what is wrong with PATCH
+        profile = profileService.patchProfile(profile.getReference(), ImmutableMap.of("pet", "Turtle"), token);
+
+        assertThat(profile.getDomainReference(), is(created.getDomainReference()));
+        assertThat(profile.getAttributeNames().size(), is(2));
+        assertThat(profile.getAttributes(), IsMapContaining.hasEntry("car", "Volvo"));
+        assertThat(profile.getAttributes(), IsMapContaining.hasEntry("pet", "Turtle"));
+        */
+        profile = profileService.deleteProfileAttribute(profile.getReference(), "car", token);
+        assertThat(profile.getDomainReference(), is(created.getDomainReference()));
+        assertThat(profile.getAttributeNames().size(), is(0));
+        //assertThat(profile.getAttributes(), IsMapContaining.hasEntry("pet", "Turtle"));
+        Domain deleted = domainService.deleteDomain(created, token);
+        assertNotNull(deleted);
+    }
+
+    @Test
     public void can_get_domain_by_reference() {
         LOGGER.trace("[ApplicationIntegrationTest] - can_get_domain_by_reference");
         String domainReference = "dom-0a22160b-563c-45a1-b497-9bff5b69a204";
@@ -81,6 +139,74 @@ public class ApplicationIntegrationTest {
         Collection<User> users =  domainService.getAllUsersFromDomain(domain.getDomainReference(),token);
         assertNotNull(users);
     }
+
+    @Test
+    public void manager_cannot_get_domain_profile() {
+        HttpClientErrorException exception = null;
+        String profileReference = "prf-746d461f-31d9-4751-8d3a-2256d03846b7";
+        try {
+            profileService.getProfile(profileReference, token);
+        } catch (HttpClientErrorException e) {
+            exception = e;
+        }
+        assertThat(exception.getStatusCode(), is(HttpStatus.FORBIDDEN));
+    }
+
+    /*@Test - TODO - expose /domains part of profile service
+    public void manager_cannot_get_domain_profile_by_domain_ref() {
+        HttpClientErrorException exception = null;
+        String domainReference = "dom-311d5438-e546-43ce-8f91-c452a154ce5f";
+        try {
+            profileService.getDomainProfile(domainReference, token);
+        } catch (HttpClientErrorException e) {
+            exception = e;
+        }
+        assertThat(exception.getStatusCode(), is(HttpStatus.FORBIDDEN));
+    }*/
+
+    @Test
+    public void user_can_get_domain_profile_and_attributes() {
+
+        //add Ajay to domain managed by Karo
+        String domainReference = "dom-311d5438-e546-43ce-8f91-c452a154ce5f";
+        Domain domain = new Domain(null, null, domainReference);
+        User user = user("usr-9832620d-ec53-43a1-873d-efdc50d34ad1");
+        Domain result = domainService.addUserToDomain(domain, user, token);
+        assertNotNull(result);
+        String ajayToken = getToken(AJAY_USERNAME, AJAY_PASSWORD);
+        String profileReference = "prf-746d461f-31d9-4751-8d3a-2256d03846b7";
+        Profile profile = profileService.getProfile(profileReference, ajayToken);
+        assertThat(profile.getReference(), is("prf-746d461f-31d9-4751-8d3a-2256d03846b7"));
+        assertThat(profile.getAttributes(), IsMapContaining.hasEntry("fruit", "Banana"));
+
+        /* - TODO - expose /domains part of profile service
+        profile = profileService.getDomainProfile(profileReference, ajayToken);
+        assertThat(profile.getReference(), is("prf-746d461f-31d9-4751-8d3a-2256d03846b7"));
+        assertThat(profile.getAttributes(), IsMapContaining.hasEntry("fruit", "Banana"));*/
+
+        String fruit = profileService.getProfileAttribute(profileReference, "fruit", ajayToken);
+        assertThat(fruit, is("Banana"));
+
+        /* - TODO - expose /domains part of profile service
+        String colour = profileService.getDomainProfileAttribute(domainReference, "colour", ajayToken);
+        assertThat(colour, is("Black"));*/
+
+        Domain deletedResult = domainService.removeUserFromDomain(user,domain,token);
+        assertNotNull(deletedResult);
+    }
+
+    @Test
+    public void user_can_get_own_profile_and_attributes() {
+
+        String karoRef = "usr-d8749acf-6a22-4438-accc-cc8d1877ba36";
+        Profile profile = profileService.getUserProfile("usr-d8749acf-6a22-4438-accc-cc8d1877ba36", token);
+        assertThat(profile.getAttributes(), IsMapContaining.hasEntry("name", "Karo Testing"));
+
+        String name = profileService.getUserProfileAttribute(karoRef, "name", token);
+        assertThat(name, is("Karo Testing"));
+
+    }
+
 
     @Test
     public void can_add_user_to_a_domain() {
