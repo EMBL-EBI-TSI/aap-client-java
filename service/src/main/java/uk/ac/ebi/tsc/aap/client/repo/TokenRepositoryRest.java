@@ -48,10 +48,10 @@ public class TokenRepositoryRest implements TokenRepository {
                                                 HttpMethod.GET, entity, String.class);
         }
         catch (HttpClientErrorException e){
-         throw new UserNameOrPasswordWrongException(String.format("username/password wrong. Please check username or password to get token"));
+         throw new UserNameOrPasswordWrongException(String.format("username/password wrong. Please check username or password to get token"),e);
         }
         catch (Exception e){
-            throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new RuntimeException("Error while getting AAP token",e);
         }
         return response.getBody();
     }

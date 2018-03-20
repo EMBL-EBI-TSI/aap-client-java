@@ -46,7 +46,7 @@ public class TokenRepositoryRestTest {
         assertThat(token, notNullValue());
     }
 
-    @Test(expected = HttpServerErrorException.class)
+    @Test(expected = RuntimeException.class)
     public void should_return_error_while_retrieving_token_on_server() {
         this.domainsApi.expect(requestTo("/auth")).andExpect(method(HttpMethod.GET))
                 .andRespond(withServerError());
