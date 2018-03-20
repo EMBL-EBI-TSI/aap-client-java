@@ -75,8 +75,9 @@ public class ProfileRepositoryRest implements ProfileRepository {
     @Override
     public Profile patchProfile(String profileReference, Map<String, String> attributes, String token) {
         HttpEntity<Map<String, String>> entity = new HttpEntity<>(attributes, createHeaders(token));
+        //workaround because PATCH verb does not work for rest template default HTTP client
         ResponseEntity<Profile> response = template.exchange(
-                "/profiles/{profileReference}", HttpMethod.PATCH,
+                "/profiles/{profileReference}?_method=patch", HttpMethod.POST,
                 entity, Profile.class, profileReference);
         return response.getBody();
     }

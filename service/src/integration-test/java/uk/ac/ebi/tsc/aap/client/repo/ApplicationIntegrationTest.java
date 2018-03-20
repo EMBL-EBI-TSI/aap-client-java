@@ -114,18 +114,18 @@ public class ApplicationIntegrationTest {
         assertThat(profile.getDomainReference(), is(created.getDomainReference()));
         assertThat(profile.getAttributeNames().size(), is(1));
         assertThat(profile.getAttributes(), IsMapContaining.hasEntry("car", "Volvo"));
-        /* seems PATCH is not exposed..TODO - check, what is wrong with PATCH
+
         profile = profileService.patchProfile(profile.getReference(), ImmutableMap.of("pet", "Turtle"), token);
 
         assertThat(profile.getDomainReference(), is(created.getDomainReference()));
         assertThat(profile.getAttributeNames().size(), is(2));
         assertThat(profile.getAttributes(), IsMapContaining.hasEntry("car", "Volvo"));
         assertThat(profile.getAttributes(), IsMapContaining.hasEntry("pet", "Turtle"));
-        */
+
         profile = profileService.deleteProfileAttribute(profile.getReference(), "car", token);
         assertThat(profile.getDomainReference(), is(created.getDomainReference()));
-        assertThat(profile.getAttributeNames().size(), is(0));
-        //assertThat(profile.getAttributes(), IsMapContaining.hasEntry("pet", "Turtle"));
+        assertThat(profile.getAttributeNames().size(), is(1));
+        assertThat(profile.getAttributes(), IsMapContaining.hasEntry("pet", "Turtle"));
         Domain deleted = domainService.deleteDomain(created, token);
         assertNotNull(deleted);
     }
@@ -152,7 +152,7 @@ public class ApplicationIntegrationTest {
         assertThat(exception.getStatusCode(), is(HttpStatus.FORBIDDEN));
     }
 
-    /*@Test - TODO - expose /domains part of profile service
+    @Test
     public void manager_cannot_get_domain_profile_by_domain_ref() {
         HttpClientErrorException exception = null;
         String domainReference = "dom-311d5438-e546-43ce-8f91-c452a154ce5f";
@@ -162,7 +162,7 @@ public class ApplicationIntegrationTest {
             exception = e;
         }
         assertThat(exception.getStatusCode(), is(HttpStatus.FORBIDDEN));
-    }*/
+    }
 
     @Test
     public void user_can_get_domain_profile_and_attributes() {
@@ -179,17 +179,15 @@ public class ApplicationIntegrationTest {
         assertThat(profile.getReference(), is("prf-746d461f-31d9-4751-8d3a-2256d03846b7"));
         assertThat(profile.getAttributes(), IsMapContaining.hasEntry("fruit", "Banana"));
 
-        /* - TODO - expose /domains part of profile service
-        profile = profileService.getDomainProfile(profileReference, ajayToken);
+        profile = profileService.getDomainProfile(domainReference, ajayToken);
         assertThat(profile.getReference(), is("prf-746d461f-31d9-4751-8d3a-2256d03846b7"));
-        assertThat(profile.getAttributes(), IsMapContaining.hasEntry("fruit", "Banana"));*/
+        assertThat(profile.getAttributes(), IsMapContaining.hasEntry("fruit", "Banana"));
 
         String fruit = profileService.getProfileAttribute(profileReference, "fruit", ajayToken);
         assertThat(fruit, is("Banana"));
 
-        /* - TODO - expose /domains part of profile service
         String colour = profileService.getDomainProfileAttribute(domainReference, "colour", ajayToken);
-        assertThat(colour, is("Black"));*/
+        assertThat(colour, is("Black"));
 
         Domain deletedResult = domainService.removeUserFromDomain(user,domain,token);
         assertNotNull(deletedResult);
@@ -204,6 +202,39 @@ public class ApplicationIntegrationTest {
 
         String name = profileService.getUserProfileAttribute(karoRef, "name", token);
         assertThat(name, is("Karo Testing"));
+
+    }
+
+    @Test
+    public void user_can_change_own_profile() {
+
+        //Ajay
+        String ajayToken = getToken(AJAY_USERNAME, AJAY_PASSWORD);
+        String ajayReference = "usr-9832620d-ec53-43a1-873d-efdc50d34ad1";
+        Profile origProfile = profileService.getUserProfile(ajayReference, ajayToken);
+        assertNotNull(origProfile);
+        assertThat(origProfile.getAttributes(), IsMapContaining.hasEntry("name", "Ajay Testing"));
+        assertThat(origProfile.getAttributes(), IsMapContaining.hasEntry("email", "embl.ebi.tsi+ajay@gmail.com"));
+
+        Profile updatedProfile = profileService.updateProfile(origProfile.getReference(), ImmutableMap.of("car", "Volvo"), ajayToken);
+        assertThat(updatedProfile.getUserReference(), is(origProfile.getUserReference()));
+        assertThat(updatedProfile.getAttributeNames().size(), is(1));
+        assertThat(updatedProfile.getAttributes(), IsMapContaining.hasEntry("car", "Volvo"));
+
+        updatedProfile = profileService.patchProfile(origProfile.getReference(), ImmutableMap.of("pet", "Turtle"), ajayToken);
+
+        assertThat(updatedProfile.getUserReference(), is(origProfile.getUserReference()));
+        assertThat(updatedProfile.getAttributeNames().size(), is(2));
+        assertThat(updatedProfile.getAttributes(), IsMapContaining.hasEntry("car", "Volvo"));
+        assertThat(updatedProfile.getAttributes(), IsMapContaining.hasEntry("pet", "Turtle"));
+
+        updatedProfile = profileService.deleteProfileAttribute(origProfile.getReference(), "car", ajayToken);
+        assertThat(updatedProfile.getUserReference(), is(origProfile.getUserReference()));
+        assertThat(updatedProfile.getAttributeNames().size(), is(1));
+        assertThat(updatedProfile.getAttributes(), IsMapContaining.hasEntry("pet", "Turtle"));
+        //clean
+        updatedProfile = profileService.updateProfile(origProfile.getReference(), origProfile.getAttributes(), ajayToken);
+        assertNotNull(updatedProfile);
 
     }
 

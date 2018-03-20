@@ -35,6 +35,16 @@ public class ProfileService {
         return this.repo.updateProfile(profileReference, attributes, token);
     }
 
+    /**
+     *
+     * Currently uses _method query parameter as a workaround for executing PATCH
+     * In case of problem with the methos, please let us know
+     * or call API endpoint directly
+     * @param profileReference
+     * @param attributes
+     * @param token
+     * @return
+     */
     public Profile patchProfile(String profileReference, Map<String, String> attributes, String token) {
         return this.repo.patchProfile(profileReference, attributes, token);
     }
@@ -56,6 +66,6 @@ public class ProfileService {
     }
 
     public String getDomainProfileAttribute(String domainReference, String attributeName, String token) {
-        return this.repo.getUserProfileAttribute(domainReference, attributeName, token);
+        return this.repo.getDomainProfileAttribute(domainReference, attributeName, token);
     }
 }

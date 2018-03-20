@@ -41,7 +41,7 @@ subprojects {
     dependencies {
         compile("org.springframework.boot:spring-boot-starter")
         compile("com.fasterxml.jackson.core:jackson-annotations:2.8.11") // from 2.9, cannot use @JsonIgnore
-        compile("com.google.guava:guava:24.1-jre")
+        testCompile("com.google.guava:guava:24.1-jre")
         testCompile('org.springframework.boot:spring-boot-starter-test')
     }
 
