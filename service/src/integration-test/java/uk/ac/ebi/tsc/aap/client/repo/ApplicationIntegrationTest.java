@@ -36,8 +36,8 @@ import static org.junit.Assert.assertNotNull;
 @EnableAutoConfiguration
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {DomainService.class,TokenService.class, ProfileService.class})
-@TestPropertySource(properties = {"aap.domains.url=https://dev.api.aap.tsi.ebi.ac.uk",
-        "aap.profiles.url=https://dev.api.aap.tsi.ebi.ac.uk"})
+@TestPropertySource(locations = {"classpath:application-service.properties"},
+        properties = {"aap.url=https://dev.api.aap.tsi.ebi.ac.uk"})
 public class ApplicationIntegrationTest {
     //logger initialised
     private static final Logger LOGGER = LoggerFactory.getLogger
