@@ -54,6 +54,11 @@ public class Profile {
     }
 
     @JsonIgnore
+    public String getDomainName() {
+        return this.domain != null ?  this.domain.getDomainName() : null;
+    }
+
+    @JsonIgnore
     public String getDomainReference() {
         return this.domain != null ?  this.domain.getDomainReference() : null;
     }
