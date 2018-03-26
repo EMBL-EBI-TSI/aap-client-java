@@ -1,24 +1,18 @@
 package uk.ac.ebi.tsc.aap.client.repo;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = TokenService.class)
 public class TokenServiceTest {
 
-    @Autowired
     private TokenService tokenService;
 
-    @MockBean
-    private TokenRepository tokenRepository;
+    public TokenServiceTest() {
+        tokenService = new TokenService(mock(TokenRepository.class));
+    }
 
     @Test
     public void can_get_user_ref_from_token(){
