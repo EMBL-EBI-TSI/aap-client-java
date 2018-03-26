@@ -1,9 +1,11 @@
 package uk.ac.ebi.tsc.aap.client.repo;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.interfaces.DecodedJWT;
+import org.apache.tomcat.util.codec.binary.StringUtils;
+import org.jose4j.jwt.JwtClaims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Base64;
 
 /**
  * Created by ukumbham on 21/09/2017.
@@ -23,12 +25,13 @@ public class TokenService {
     }
 
     public String getUserReference(String token) {
-        String userReference = null;
-
-        DecodedJWT decodedJwt = JWT.decode(token);
-        userReference = decodedJwt.getSubject();
-
-        return userReference;
+        try {
+            String base64Payload = token.split("\\.")[1];
+            String payload = StringUtils.newStringUtf8(Base64.getDecoder().decode(base64Payload));
+            return JwtClaims.parse(payload).getSubject();
+        } catch (Throwable t) {
+            throw new RuntimeException("Error while getting user reference", t);
+        }
     }
 
 }
