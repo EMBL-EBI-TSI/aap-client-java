@@ -19,7 +19,7 @@ repositories {
 }
 
 dependencies {
-	compile( group: 'uk.ac.ebi.tsc.aap.client', name: 'service', version: '0.1-SNAPSHOT')
+	compile( group: 'uk.ac.ebi.tsc.aap.client', name: 'service', version: '1.0.2-SNAPSHOT')
 }
 ```
 
@@ -28,12 +28,28 @@ Use the provided classes to secure your API: more to come on this section soon!
 ### Configure which AAP environment to talk to
 
 By default, the client uses our 'explore' environment, which we use as a sandbox for other parties integrating with us.
-To switch to another environment (for example, production):
-  - Download the certificate from the environment:
-https://api.aai.ebi.ac.uk/meta/public.der, and bundle that in your resources
-  - Add the following properties (for ex, in your main application.properties):
-    * `aap.domains.url` to https://api.aai.ebi.ac.uk
-    * `jwt.certificate` to the path/to/the/public/certificate.der 
+To switch to another environment (for example, production https://api.aai.ebi.ac.uk), add the following properties 
+(for ex, in your main `application.properties`):
+
+If you use the security module:
+```properties
+aap.url=https://api.aai.ebi.ac.uk
+```
+If you use the service module:
+```properties
+jwt.certificate=https://api.aai.ebi.ac.uk/meta/public.der
+```
+
+If you happen to use both, you can re-use the URL property in the definition of the certificate property so they're 
+always in sync:
+```properties
+aap.url=https://api.aai.ebi.ac.uk
+jwt.certificate=${aap.url}/meta/public.der
+```
+
+If you would rather not read the public key dynamically on startup, you can instead download it 
+(https://api.aai.ebi.ac.uk/meta/public.der for production), bundle it with your resources and update `jwt.certificate` 
+to `path/to/the/public/certificate.der`.
 
 ### Prerequisites
 
@@ -43,7 +59,7 @@ should be easy to infer.
 For building the components, you'll need to have setup a GPG signing key (for example by following the [instructions of
 the good folks of github](https://help.github.com/articles/generating-a-new-gpg-key/#generating-a-gpg-key)), and define
 a signatory in gradle (typically in `~/.gradle/gradle.properties`):
-```
+```properties
 signing.keyId=1A2B3C4D
 signing.password=changeme
 signing.secretKeyRingFile=path/to/secring.gpg
@@ -51,7 +67,7 @@ signing.secretKeyRingFile=path/to/secring.gpg
 *Note* the long SHA does not seem to work (at least on windows), so use  `$ gpg --list-secret-keys` instead, and what you need in `keyId` is what's in `sec` after the `/`.
 
 It is also necessary to have defined the following variables (even if you are not using the uploadArchive task):
-```
+```properties
 ossrhUsername=someone
 ossrhPassword=secret
 ```
