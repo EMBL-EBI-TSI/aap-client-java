@@ -15,14 +15,20 @@ public class Profile {
     private String reference;
     private User user;
     private Domain domain;
+    private String schema;
     private Map<String, String> attributes = new HashMap<>();
 
     private Profile() {}
 
     public Profile(String reference, User user, Domain domain, Map<String, String> attributes) {
+        this(reference, user, domain, null, attributes);
+    }
+
+    public Profile(String reference, User user, Domain domain, String schema, Map<String, String> attributes) {
         this.reference = reference;
         this.user = user;
         this.domain = domain;
+        this.schema = schema;
         this.attributes = attributes;
     }
 
@@ -38,6 +44,15 @@ public class Profile {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public Domain getDomain() {
         return domain;
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public String getSchema() {
+        return schema;
+    }
+
+    public boolean hasSchema() {
+        return schema != null && !"".equals(schema.trim());
     }
 
     public String getAttribute(String name) {
@@ -113,6 +128,11 @@ public class Profile {
             if (domainReference != null) {
                 profile.domain = Domain.builder().withReference(domainReference).build();
             }
+            return this;
+        }
+
+        public Builder withSchema(String schema) {
+            profile.schema = schema;
             return this;
         }
 

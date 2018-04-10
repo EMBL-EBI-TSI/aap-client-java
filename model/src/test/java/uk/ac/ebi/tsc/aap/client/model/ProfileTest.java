@@ -87,4 +87,12 @@ public class ProfileTest {
                 .build();
         assertNull(profile.getReference());
     }
+
+    @Test public void
+    can_define_a_schema() {
+        Profile.Builder builder = Profile.builder()
+                .withSchema("something!");
+        Profile actual = builder.build();
+        assertThat(actual.getSchema(), is("something!"));
+    }
 }
