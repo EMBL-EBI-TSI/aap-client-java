@@ -21,14 +21,14 @@ public class UserTest {
 
     @Test public void
     can_build_minimalist_user() {
-        User.Builder subject = new User.Builder("foo");
+        User.Builder subject = User.builder().withReference("foo");
         User actual = subject.build();
         assertThat(actual.getUserReference(), equalTo("foo"));
     }
 
     @Test public void
     can_build_user_with_domain_names() {
-        User.Builder subject = new User.Builder("anything");
+        User.Builder subject = User.builder();
         subject.withDomains("one", "two");
 
         User actual = subject.build();
@@ -39,7 +39,8 @@ public class UserTest {
 
     @Test public void
     does_not_leak_authentication_details() throws IOException {
-        User subject = new User.Builder("bar")
+        User subject = User.builder()
+                .withReference("bar")
                 .withUsername("foo")
                 .withEmail("foo@somewhere.com")
                 .withFullName("Foo Test")

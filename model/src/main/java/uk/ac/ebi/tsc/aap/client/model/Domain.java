@@ -20,6 +20,10 @@ public class Domain implements Serializable, GrantedAuthority {
     private Set<User> users = new HashSet<>();
     private Set<User> managers = new HashSet<>();
 
+    /**
+     * @see Domain#builder()
+     */
+    @Deprecated
     public Domain() {
     }
 
@@ -94,5 +98,66 @@ public class Domain implements Serializable, GrantedAuthority {
     @Override
     public String getAuthority() {
         return "ROLE_"+domainName;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private Domain domain;
+
+        Builder() {
+            domain = new Domain();
+        }
+
+        public Builder withReference(String reference) {
+            domain.domainReference = reference;
+            return this;
+        }
+
+        public Builder withName(String name) {
+            domain.domainName = name;
+            return this;
+        }
+
+        public Builder withDescription(String description) {
+            domain.domainDesc = description;
+            return this;
+        }
+
+        public Builder withUser(User member) {
+            domain.users.add(member);
+            return this;
+        }
+
+        public Builder withUser(String userReference) {
+            domain.users.add(User.builder().withReference(userReference).build());
+            return this;
+        }
+
+        public Builder withUsers(Set<User> users) {
+            domain.users.addAll(users);
+            return this;
+        }
+
+        public Builder withManager(User manager) {
+            domain.managers.add(manager);
+            return this;
+        }
+
+        public Builder withManager(String managerReference) {
+            domain.managers.add(User.builder().withReference(managerReference).build());
+            return this;
+        }
+
+        public Builder withManagers(Set<User> managers) {
+            domain.managers.addAll(managers);
+            return this;
+        }
+
+        public Domain build() {
+            return domain;
+        }
     }
 }

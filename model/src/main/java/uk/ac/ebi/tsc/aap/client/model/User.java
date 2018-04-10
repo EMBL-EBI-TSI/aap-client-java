@@ -23,6 +23,10 @@ public class User implements Serializable, UserDetails {
     private String fullName;
     private Set<Domain> domains;
 
+    /**
+     * @see User#builder()
+     */
+    @Deprecated
     public User(){}
 
     public User(String userName, String email, String userReference, String fullName, Set<Domain> domains) {
@@ -135,13 +139,34 @@ public class User implements Serializable, UserDetails {
         return true;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static class Builder {
 
         private User user;
 
-        public Builder(String reference) {
+        /**
+         * @see User#builder()
+         */
+        @Deprecated
+        public Builder() {
             user = new User();
+        }
+
+        /**
+         * @see User#builder()#withReference(String)
+         */
+        @Deprecated
+        public Builder(String reference) {
+            this();
+            withReference(reference);
+        }
+
+        public Builder withReference(String reference) {
             user.setUserReference(reference);
+            return this;
         }
 
         public Builder withUsername(String username) {
@@ -164,10 +189,10 @@ public class User implements Serializable, UserDetails {
             return this;
         }
 
-        public Builder withDomains(String... domains) {
-            Set<Domain> domainsSet = new HashSet<>();
-            Arrays.asList(domains).forEach(name->domainsSet.add(new Domain(name,null,null)));
-            user.setDomains(domainsSet);
+        public Builder withDomains(String... domainNames) {
+            Set<Domain> domains = new HashSet<>();
+            Arrays.asList(domainNames).forEach(name->domains.add(Domain.builder().withName(name).build()));
+            user.setDomains(domains);
             return this;
         }
 

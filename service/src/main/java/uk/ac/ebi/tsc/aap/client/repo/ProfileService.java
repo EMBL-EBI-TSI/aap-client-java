@@ -19,7 +19,7 @@ public class ProfileService {
     }
 
     public Profile createDomainProfile(String domainReference, Map<String, String> attributes, String token) {
-        Profile profile = new Profile.Builder().withDomain(domainReference).withAttributes(attributes).build();
+        Profile profile = Profile.builder().withDomain(domainReference).withAttributes(attributes).build();
         return this.repo.createProfile(profile, token);
     }
 

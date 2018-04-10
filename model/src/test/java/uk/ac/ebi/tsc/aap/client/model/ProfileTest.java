@@ -14,14 +14,14 @@ public class ProfileTest {
 
     @Test public void
     can_build_minimalistic_profile() {
-        Profile.Builder subject = new Profile.Builder("bar");
+        Profile.Builder subject = Profile.builder().withReference("bar");
         Profile actual = subject.build();
         assertThat(actual.getReference(), equalTo("bar"));
     }
 
     @Test public void
     can_build_profile_with_given_attribute() {
-        Profile.Builder subject = new Profile.Builder("irrelevant")
+        Profile.Builder subject = Profile.builder()
                 .withAttribute("given", "attribute");
         Profile actual = subject.build();
         assertThat(actual.getAttribute("given"), equalTo("attribute"));
@@ -29,7 +29,7 @@ public class ProfileTest {
 
     @Test public void
     can_build_profile_with_several_attributes() {
-        Profile.Builder subject = new Profile.Builder("irrelevant")
+        Profile.Builder subject = Profile.builder()
                 .withAttribute("given", "attribute")
                 .withAttribute("other", "one");
 
@@ -42,7 +42,7 @@ public class ProfileTest {
 
     @Test public void
     can_get_all_attributes() {
-        Profile profile = new Profile.Builder("foo")
+        Profile profile = Profile.builder()
                 .withAttribute("one", "un")
                 .withAttribute("two", "deux")
                 .build();
@@ -57,7 +57,7 @@ public class ProfileTest {
     @Test public void
     is_empty_user_reference_ignored() {
         String userReference = null;
-        Profile profile = new Profile.Builder()
+        Profile profile = Profile.builder()
                 .withUser(userReference)
                 .build();
         assertNull(profile.getUser());
@@ -66,7 +66,7 @@ public class ProfileTest {
     @Test public void
     is_empty_domain_reference_ignored() {
         String domainReference = null;
-        Profile profile = new Profile.Builder()
+        Profile profile = Profile.builder()
                 .withDomain(domainReference)
                 .build();
         assertNull(profile.getDomain());
@@ -74,7 +74,7 @@ public class ProfileTest {
 
     @Test public void
     can_build_profile_with_domain() {
-        Profile profile = new Profile.Builder()
+        Profile profile = Profile.builder()
                 .withDomain("domRefe")
                 .build();
         assertThat(profile.getDomain().getDomainReference(), is("domRefe"));
@@ -82,7 +82,7 @@ public class ProfileTest {
 
     @Test public void
     can_build_profile_without_reference() {
-        Profile profile = new Profile.Builder()
+        Profile profile = Profile.builder()
                 .withUser("abc")
                 .build();
         assertNull(profile.getReference());

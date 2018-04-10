@@ -68,13 +68,25 @@ public class Profile {
         return this.user != null ? this.user.getUserReference() : null;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static class Builder {
         Profile profile;
 
+        /**
+         * @see Profile#builder()
+         */
+        @Deprecated
         public Builder() {
             profile = new Profile();
         }
 
+        /**
+         * @see Profile#builder()#withReference(String)
+         */
+        @Deprecated
         public Builder(String reference) {
             profile = new Profile();
             profile.reference = reference;
@@ -92,14 +104,14 @@ public class Profile {
 
         public Builder withUser(String userReference) {
             if (userReference != null) {
-                profile.user = new User.Builder(userReference).build();
+                profile.user = User.builder().withReference(userReference).build();
             }
             return this;
         }
 
         public Builder withDomain(String domainReference) {
             if (domainReference != null) {
-                profile.domain = new Domain(domainReference);
+                profile.domain = Domain.builder().withReference(domainReference).build();
             }
             return this;
         }
