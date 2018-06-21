@@ -41,6 +41,7 @@ public class TokenAuthenticationService {
         catch(Exception e) {
             LOGGER.error(e.getMessage());
             LOGGER.debug("Cannot extract authentication details from token", e);
+            request.setAttribute("ERROR_MSG" ,e.getMessage());
             return null;
         }
 

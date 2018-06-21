@@ -43,6 +43,7 @@ subprojects {
         compile("com.fasterxml.jackson.core:jackson-annotations:2.8.11") // from 2.9, cannot use @JsonIgnore
         testCompile("com.google.guava:guava:24.1-jre")
         testCompile('org.springframework.boot:spring-boot-starter-test')
+        compile (group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.5')
     }
 
     bootRepackage {

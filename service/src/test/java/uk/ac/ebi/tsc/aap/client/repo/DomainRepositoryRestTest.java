@@ -22,12 +22,15 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static uk.ac.ebi.tsc.aap.client.test.TimeoutResponseCreator.withTimeout;
-
+import uk.ac.ebi.tsc.aap.client.exception.TokenNotSuppliedException;
+import uk.ac.ebi.tsc.aap.client.exception.InvalidJWTTokenException;
+import uk.ac.ebi.tsc.aap.client.exception.TokenExpiredException;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes=DomainRepositoryRest.class)
@@ -123,6 +126,57 @@ public class DomainRepositoryRestTest {
 
 		subject.createDomain(aDomain(), "a-token");
 
+		this.domainsApi.verify();
+	}
+
+	@Test(expected = TokenNotSuppliedException.class) public void
+	throw_proper_exception_no_token() {
+		Domain domain = domain("foo", "The Foo");
+		String mockResponse = "{" +
+				"timestamp\" : 1529510193939,\n" +
+				"  \"status\" : 401,\n" +
+				"  \"error\" : \"Unauthorized\",\n" +
+				"  \"message\" : \"Token not supplied\",\n" +
+				"  \"path\" : \"/domains/\"\n" +
+				"}";
+		this.domainsApi.expect(requestTo("/domains/")).andExpect(method(HttpMethod.POST)).andExpect(header("Authorization","Bearer "))
+				.andRespond(withStatus(HttpStatus.UNAUTHORIZED).body(mockResponse).contentType(MediaType.APPLICATION_JSON));
+
+		subject.createDomain(domain, "");
+		this.domainsApi.verify();
+	}
+
+	@Test(expected = InvalidJWTTokenException.class) public void
+	throw_proper_exception_invalid_token() {
+		Domain domain = domain("foo", "The Foo");
+		String mockResponse = "{" +
+				"timestamp\" : 1529510193939,\n" +
+				"  \"status\" : 401,\n" +
+				"  \"error\" : \"Unauthorized\",\n" +
+				"  \"message\" : \"Token is not a valid JWT token\",\n" +
+				"  \"path\" : \"/domains/\"\n" +
+				"}";
+		this.domainsApi.expect(requestTo("/domains/")).andExpect(method(HttpMethod.POST)).andExpect(header("Authorization","Bearer INVALID_TOKEN"))
+				.andRespond(withStatus(HttpStatus.UNAUTHORIZED).body(mockResponse).contentType(MediaType.APPLICATION_JSON));
+
+		subject.createDomain(domain, "INVALID_TOKEN");
+		this.domainsApi.verify();
+	}
+
+	@Test(expected = TokenExpiredException.class) public void
+	throw_proper_exception_expired_token() {
+		Domain domain = domain("foo", "The Foo");
+		String mockResponse = "{" +
+				"timestamp\" : 1529510193939,\n" +
+				"  \"status\" : 401,\n" +
+				"  \"error\" : \"Unauthorized\",\n" +
+				"  \"message\" : \"Token has been expired\",\n" +
+				"  \"path\" : \"/domains/\"\n" +
+				"}";
+		this.domainsApi.expect(requestTo("/domains/")).andExpect(method(HttpMethod.POST)).andExpect(header("Authorization","Bearer EXPIRED_TOKEN"))
+				.andRespond(withStatus(HttpStatus.UNAUTHORIZED).body(mockResponse).contentType(MediaType.APPLICATION_JSON));
+
+		subject.createDomain(domain, "EXPIRED_TOKEN");
 		this.domainsApi.verify();
 	}
 
