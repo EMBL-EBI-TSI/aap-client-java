@@ -29,6 +29,9 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertNotNull;
+import uk.ac.ebi.tsc.aap.client.exception.TokenNotSuppliedException;
+import uk.ac.ebi.tsc.aap.client.exception.InvalidJWTTokenException;
+import uk.ac.ebi.tsc.aap.client.exception.TokenExpiredException;
 
 /**
  * Created by ukumbham on 21/08/2017.
@@ -85,6 +88,36 @@ public class ApplicationIntegrationTest {
         assertNotNull(created);
         Domain deleted = domainService.deleteDomain(created, token);
         assertNotNull(deleted);
+    }
+
+    @Test(expected = TokenNotSuppliedException.class)
+    public void throw_excpetion_on_no_token() {
+        LOGGER.trace("[ApplicationIntegrationTest] - throw_excpetion_on_no_token");
+        String uniqueName = "Iam not client "+ new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(new Date());
+        domainService.createDomain(uniqueName, "aap client java integration test", "");
+    }
+
+    @Test(expected = InvalidJWTTokenException.class)
+    public void throw_excpetion_on_invalid_token() {
+        LOGGER.trace("[ApplicationIntegrationTest] - throw_excpetion_on_no_token");
+        String uniqueName = "Iam not client "+ new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(new Date());
+        domainService.createDomain(uniqueName, "aap client java integration test", "INVALID_TOKEN");
+    }
+
+    @Test(expected = TokenExpiredException.class)
+    public void throw_excpetion_on_expired_token() {
+        LOGGER.trace("[ApplicationIntegrationTest] - throw_excpetion_on_no_token");
+        String expiredToken = "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Rldi5hYXAudHNpLmViaS5hYy51ay9zcCIsImV4cCI6MTUyOTU5Mjc0" +
+                "OCwianRpIjoiQWtzUWlzWVRNc21mZzllbEhZaWFwdyIsImlhdCI6MTUyOTU5MjY4OCwic3ViIjoidXNyLWQ4NzQ5YWNmLTZhMjItNDQz" +
+                "OC1hY2NjLWNjOGQxODc3YmEzNiIsImVtYWlsIjoiZW1ibC5lYmkudHNpQGdtYWlsLmNvbSIsIm5pY2tuYW1lIjoia2FybyIsIm5hbWUi" +
+                "OiJLYXJvIFRlc3RpbmciLCJkb21haW5zIjpbImFhcC5tZS5hZG1pbiIsInNlbGYudXNoYURvbWFpbiIsIlVTSV9uZWlsZyIsImFhcC5k" +
+                "b21haW4udmlldyIsImFhcC11c2Vycy1kb21haW4iLCJhYXAudXNlci52aWV3Il19.BYsQ2mhlIHpLr_gyxj25QHO56UjMDPd_ZsdkfIU" +
+                "D3eSUEOllQHKl2717tvX7UdD1Hwb7OCAPHmEybQlYgKrWei6MN0Hw9wVYbNlDueXSe3tO-ihCHnpAy-PlvdPLGd36SgGzrkvxfjwx_y" +
+                "ve4USEckljHesbmhzfkNda83jnfxN-FD88U6z9z5lr0yUTI5jL-wXaxjHbAffMfXRlTZ9Ow1hztlzeHuVG_JNRsPRTEweAdpNsQf" +
+                "akSa1DqkcBH3qlOjTHrK7W_IfPmXuo_CaYFFMM1wvO_1DCF_7bLXHME0M7I-uaOiIlo-VgmHx2ILNu_mtOpuQtsMPf3DnspOx6PQ";
+
+        String uniqueName = "Iam not client "+ new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(new Date());
+        domainService.createDomain(uniqueName, "aap client java integration test", expiredToken);
     }
 
     @Test
