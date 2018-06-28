@@ -90,7 +90,7 @@ public class ApplicationIntegrationTest {
         assertNotNull(deleted);
     }
 
-    //@Test(expected = TokenNotSuppliedException.class)
+    @Test(expected = TokenNotSuppliedException.class)
     public void throw_excpetion_on_no_token() {
         LOGGER.trace("[ApplicationIntegrationTest] - throw_excpetion_on_no_token");
         String uniqueName = "Iam not client "+ new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(new Date());
@@ -104,7 +104,7 @@ public class ApplicationIntegrationTest {
         domainService.createDomain(uniqueName, "aap client java integration test", "INVALID_TOKEN");
     }
 
-    //@Test(expected = TokenExpiredException.class)
+    @Test(expected = TokenExpiredException.class)
     public void throw_excpetion_on_expired_token() {
         LOGGER.trace("[ApplicationIntegrationTest] - throw_excpetion_on_no_token");
         String expiredToken = "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Rldi5hYXAudHNpLmViaS5hYy51ay9zcCIsImV4cCI6MTUyOTU5Mjc0" +
