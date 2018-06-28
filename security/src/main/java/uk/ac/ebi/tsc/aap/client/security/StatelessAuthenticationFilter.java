@@ -5,6 +5,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.GenericFilterBean;
+import uk.ac.ebi.tsc.aap.client.exception.InvalidJWTTokenException;
+import uk.ac.ebi.tsc.aap.client.exception.TokenExpiredException;
+import uk.ac.ebi.tsc.aap.client.exception.TokenNotSuppliedException;
+import uk.ac.ebi.tsc.aap.client.model.ErrorResponse;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -38,9 +42,19 @@ public class StatelessAuthenticationFilter extends GenericFilterBean {
                          FilterChain filterChain)
             throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
+        try {
         Authentication authentication = authenticationService.getAuthentication(httpRequest);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         filterChain.doFilter(request, response);
-        SecurityContextHolder.getContext().setAuthentication(null);
+        }catch (TokenNotSuppliedException | InvalidJWTTokenException | TokenExpiredException e) {
+            ErrorResponse errorResponse = new ErrorResponse();
+            errorResponse.setError(e.getCode());
+            errorResponse.setMessage(e.getMessage());
+            errorResponse.setException(e.getClass().getCanonicalName());
+            httpRequest.setAttribute("ERROR_RESPONSE",errorResponse);
+            filterChain.doFilter(request, response);
+            SecurityContextHolder.getContext().setAuthentication(null);
+        }
+
     }
 }

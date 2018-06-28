@@ -30,6 +30,7 @@ public class ProfileRepositoryRest implements ProfileRepository {
                 .rootUri(domainsApiUrl)
                 .setConnectTimeout(timeout)
                 .setReadTimeout(timeout)
+                .errorHandler(new AAPResponseErrorHandler())
                 .build();
     }
 

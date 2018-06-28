@@ -5,6 +5,11 @@ package uk.ac.ebi.tsc.aap.client.exception;
  * Responsible to throw custom error message to the user
  */
 public class TokenNotSuppliedException extends AAPException {
+
+    String code = "NO_TOKEN";
+    public String getCode() {
+        return code;
+    }
     public TokenNotSuppliedException(String message){
         super(message);
     }

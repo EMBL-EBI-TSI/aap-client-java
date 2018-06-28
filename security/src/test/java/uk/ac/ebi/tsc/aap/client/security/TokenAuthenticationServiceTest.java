@@ -5,11 +5,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import javax.servlet.http.HttpServletRequest;
-
+import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -46,15 +45,15 @@ public class TokenAuthenticationServiceTest {
     @Test public void
     detects_empty_authorization_header() {
         HttpServletRequest request = withAuthorizationHeader("");
-        Authentication auth = subject.getAuthentication(request);
-        assertNull(auth);
+        Throwable thrown = catchThrowable(() -> subject.getAuthentication(request));
+        assertThat(thrown);
     }
 
     @Test public void
     detects_non_bearer_authorization_header() {
         HttpServletRequest request = withAuthorizationHeader("blah ");
-        Authentication auth = subject.getAuthentication(request);
-        assertNull(auth);
+        Throwable thrown = catchThrowable(() -> subject.getAuthentication(request));
+        assertThat(thrown);
     }
 
     @Test public void
@@ -62,8 +61,8 @@ public class TokenAuthenticationServiceTest {
         HttpServletRequest request = withAuthorizationHeader("Bearer pretend-invalid-token");
         when(request.getHeader("Authorization").
                 equals("Bearer pretend-invalid-token")).thenReturn(null);
-        Authentication auth = subject.getAuthentication(request);
-        assertNull(auth);
+        Throwable thrown = catchThrowable(() -> subject.getAuthentication(request));
+        assertThat(thrown);
     }
 
     private HttpServletRequest withAuthorizationHeader(String value) {

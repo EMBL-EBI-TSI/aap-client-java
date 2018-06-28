@@ -7,8 +7,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import uk.ac.ebi.tsc.aap.client.model.User;
-
 import javax.servlet.http.HttpServletRequest;
+import uk.ac.ebi.tsc.aap.client.exception.TokenNotSuppliedException;
 
 /**
  * Extracts user authentication details from HTTP request
@@ -22,7 +22,6 @@ public class TokenAuthenticationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(TokenAuthenticationService.class);
     private static final String TOKEN_HEADER_KEY = "Authorization";
     private static final String TOKEN_HEADER_VALUE_PREFIX = "Bearer";
-
     private final TokenHandler tokenHandler;
 
     @Autowired
@@ -30,21 +29,13 @@ public class TokenAuthenticationService {
         this.tokenHandler = tokenHandler;
     }
 
-    public Authentication getAuthentication(HttpServletRequest request){
+    public Authentication getAuthentication(HttpServletRequest request)   {
         LOGGER.trace("getAuthentication");
-        try {
-            final String token = extractToken(request);
-            if (token == null) return null;
-            User user = tokenHandler.parseUserFromToken(token);
-            return new UserAuthentication(user);
-        }
-        catch(Exception e) {
-            LOGGER.error(e.getMessage());
-            LOGGER.debug("Cannot extract authentication details from token", e);
-            request.setAttribute("ERROR_MSG" ,e.getMessage());
-            return null;
-        }
-
+        final String token = extractToken(request);
+        if (token == null)
+            throw new TokenNotSuppliedException("Token not supplied");
+        User user = tokenHandler.parseUserFromToken(token);
+        return new UserAuthentication(user);
     }
 
     public String extractToken(HttpServletRequest request) {

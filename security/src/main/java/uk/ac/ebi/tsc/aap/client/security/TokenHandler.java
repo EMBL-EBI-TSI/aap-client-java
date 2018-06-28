@@ -3,6 +3,7 @@ package uk.ac.ebi.tsc.aap.client.security;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.MalformedClaimException;
 import org.jose4j.jwt.consumer.InvalidJwtException;
+import org.jose4j.jwt.consumer.InvalidJwtSignatureException;
 import org.jose4j.jwt.consumer.JwtConsumer;
 import org.jose4j.jwt.consumer.JwtConsumerBuilder;
 import org.slf4j.Logger;
@@ -10,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.stereotype.Component;
+import uk.ac.ebi.tsc.aap.client.exception.InvalidJWTTokenException;
+import uk.ac.ebi.tsc.aap.client.exception.TokenExpiredException;
 import uk.ac.ebi.tsc.aap.client.model.Domain;
 import uk.ac.ebi.tsc.aap.client.model.User;
 
@@ -61,8 +64,8 @@ public class TokenHandler {
                 .build();
     }
 
-   public User parseUserFromToken(String token) {
-        try {
+   public User parseUserFromToken(String token)  {
+       try {
             Set<Domain> domainsSet = new HashSet<>();
             JwtClaims jwtClaims = jwtConsumer.processToClaims(token);
             String userReference = jwtClaims.getSubject();
@@ -72,11 +75,20 @@ public class TokenHandler {
             List<String> domains = jwtClaims.getStringListClaimValue("domains");
             domains.forEach(name->domainsSet.add(new Domain(name,null,null)));
             return new User(nickname, email, userReference, fullName, domainsSet);
-        } catch (InvalidJwtException | MalformedClaimException e) {
-            throw new RuntimeException("Cannot parse token: "+e.getMessage(), e);
-        } catch (Exception e) {
-            throw new RuntimeException("Cannot parse token: "+e.getMessage(), e);
-        }
+       } catch (InvalidJwtSignatureException e) {
+           LOGGER.error("JWT Error : "+e.getMessage());
+           throw new InvalidJWTTokenException("Supplied Token is not valid for this server");
+       } catch (MalformedClaimException e) {
+           LOGGER.error("JWT Error : "+e.getMessage());
+           throw new InvalidJWTTokenException(e.getMessage());
+       } catch (InvalidJwtException e) {
+           LOGGER.error("JWT Error : "+e.getMessage());
+           if(e.getMessage().contains("Unable to process JOSE object"))
+               throw new InvalidJWTTokenException("Supplied Token is not a valid JWT token");
+           else if(e.getMessage().contains("JWT is no longer valid"))
+               throw new TokenExpiredException("Supplied Token has been expired");
+           else throw new InvalidJWTTokenException(e.getMessage());
+       }
     }
 
 }

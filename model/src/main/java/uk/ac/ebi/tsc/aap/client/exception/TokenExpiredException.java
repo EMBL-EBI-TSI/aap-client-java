@@ -5,7 +5,10 @@ package uk.ac.ebi.tsc.aap.client.exception;
  * Responsible to throw custom error message to the user
  */
 public class TokenExpiredException extends AAPException {
-    public TokenExpiredException(String message){
-        super(message);
+
+    String code = "TOKEN_EXPIRED";
+    public String getCode() {
+        return code;
     }
+    public TokenExpiredException(String message){ super(message); }
 }

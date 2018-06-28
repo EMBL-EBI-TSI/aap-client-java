@@ -133,9 +133,9 @@ public class DomainRepositoryRestTest {
 	throw_proper_exception_no_token() {
 		Domain domain = domain("foo", "The Foo");
 		String mockResponse = "{" +
-				"timestamp\" : 1529510193939,\n" +
+				"\"timestamp\" : 1529510193939,\n" +
 				"  \"status\" : 401,\n" +
-				"  \"error\" : \"Unauthorized\",\n" +
+				"  \"error\" : \"NO_TOKEN\",\n" +
 				"  \"message\" : \"Token not supplied\",\n" +
 				"  \"path\" : \"/domains/\"\n" +
 				"}";
@@ -150,9 +150,9 @@ public class DomainRepositoryRestTest {
 	throw_proper_exception_invalid_token() {
 		Domain domain = domain("foo", "The Foo");
 		String mockResponse = "{" +
-				"timestamp\" : 1529510193939,\n" +
+				"\"timestamp\" : 1529510193939,\n" +
 				"  \"status\" : 401,\n" +
-				"  \"error\" : \"Unauthorized\",\n" +
+				"  \"error\" : \"INVALID_JWT\",\n" +
 				"  \"message\" : \"Token is not a valid JWT token\",\n" +
 				"  \"path\" : \"/domains/\"\n" +
 				"}";
@@ -167,9 +167,9 @@ public class DomainRepositoryRestTest {
 	throw_proper_exception_expired_token() {
 		Domain domain = domain("foo", "The Foo");
 		String mockResponse = "{" +
-				"timestamp\" : 1529510193939,\n" +
+				"\"timestamp\" : 1529510193939,\n" +
 				"  \"status\" : 401,\n" +
-				"  \"error\" : \"Unauthorized\",\n" +
+				"  \"error\" : \"TOKEN_EXPIRED\",\n" +
 				"  \"message\" : \"Token has been expired\",\n" +
 				"  \"path\" : \"/domains/\"\n" +
 				"}";
