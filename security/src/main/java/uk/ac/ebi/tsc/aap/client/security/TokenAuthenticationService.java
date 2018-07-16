@@ -33,12 +33,13 @@ public class TokenAuthenticationService {
         LOGGER.trace("getAuthentication");
         final String token = extractToken(request);
         if (token == null)
-            throw new TokenNotSuppliedException("Token not supplied");
+            return null;
         User user = tokenHandler.parseUserFromToken(token);
         return new UserAuthentication(user);
     }
 
     public String extractToken(HttpServletRequest request) {
+        try {
         final String header = request.getHeader(TOKEN_HEADER_KEY);
         if (header == null || !header.trim().startsWith(TOKEN_HEADER_VALUE_PREFIX.trim())) {
             LOGGER.trace("No {} header", TOKEN_HEADER_KEY);
@@ -54,5 +55,8 @@ public class TokenAuthenticationService {
             return null;
         }
         return token;
+        }catch (Exception e){
+            return null;
+        }
     }
 }
