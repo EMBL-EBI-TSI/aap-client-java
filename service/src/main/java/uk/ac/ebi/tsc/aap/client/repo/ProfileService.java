@@ -6,6 +6,13 @@ import uk.ac.ebi.tsc.aap.client.model.Profile;
 import java.util.Map;
 
 /**
+ * All methods that accept a token as an input parameter can throw
+ *  <ul>
+ *  <li>TokenNotSuppliedException if empty token is passed,</li>
+ *  <li>InvalidJWTTokenException if invalid JWT token string or token from different server is passed,</li>
+ *  <li>TokenExpiredException if expired token is passed.</li>
+ *  </ul>
+ *
  * @author aniewielska
  * @since 16/03/2018
  */
