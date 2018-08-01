@@ -53,6 +53,9 @@ public class ApplicationIntegrationTest {
     private ProfileService profileService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private TokenService tokenService;
     private static String token;
     private static String AJAY_USERNAME;
@@ -78,6 +81,16 @@ public class ApplicationIntegrationTest {
         User user = user(userReference);
         Collection<Domain> userDomains = domainService.getDomains(user, token);
         assertNotNull(userDomains);
+    }
+
+    @Test
+    public void can_create_a_local_account() {
+        LOGGER.trace("[ApplicationIntegrationTest] - can_create_a_local_account");
+        String uniqueUserName = "user-"+ new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date());
+        User user = new User(uniqueUserName, "testuser@ebi.com", null, "Foo Bar", null);
+        user.setOrganization("org");
+        String userReference = userService.createLocalAccount(user,"secret");
+        assertNotNull(userReference);
     }
 
     @Test

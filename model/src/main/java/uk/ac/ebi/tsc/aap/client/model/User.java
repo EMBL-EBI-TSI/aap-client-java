@@ -22,6 +22,7 @@ public class User implements Serializable, UserDetails {
     private String userReference;
     private String fullName;
     private Set<Domain> domains;
+    private String organization;
 
     /**
      * @see User#builder()
@@ -69,6 +70,8 @@ public class User implements Serializable, UserDetails {
         this.fullName = fullName;
     }
 
+    public void setOrganization(String organization) { this.organization = organization; }
+
     public void setDomains(Set<Domain> domains) {
         this.domains = domains;
     }
@@ -114,6 +117,9 @@ public class User implements Serializable, UserDetails {
     public String getUsername() {
         return userReference;
     }
+
+    @JsonIgnore
+    public String getOrganization() { return organization; }
 
     @JsonIgnore
     @Override
