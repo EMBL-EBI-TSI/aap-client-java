@@ -60,6 +60,7 @@ public class ApplicationIntegrationTest {
     private static String token;
     private static String AJAY_USERNAME;
     private static String AJAY_PASSWORD;
+    public static final String DOMAIN_WHERE_TEST_USER_IS_A_MANAGER = "dom-311d5438-e546-43ce-8f91-c452a154ce5f";
 
     @BeforeClass
     public static void setUp() {
@@ -288,7 +289,7 @@ public class ApplicationIntegrationTest {
     @Test
     public void can_add_user_to_a_domain() {
         LOGGER.trace("[ApplicationIntegrationTest] - can_add_user_to_a_domain-"+token);
-        Domain domain = new Domain(null, null, "dom-0a22160b-563c-45a1-b497-9bff5b69a204");
+        Domain domain = new Domain(null, null, DOMAIN_WHERE_TEST_USER_IS_A_MANAGER);
         User user = user("usr-cebc0e02-24e1-40a6-b0a5-75c10ddffb86");
         Domain result = domainService.addUserToDomain(domain, user, token);
         assertNotNull(result);
@@ -299,7 +300,7 @@ public class ApplicationIntegrationTest {
     @Test
     public void can_add_manager_to_a_domain() {
         LOGGER.trace("[ApplicationIntegrationTest] - can_add_manager_to_a_domain-"+token);
-        Domain domain = new Domain(null, null, "dom-0a22160b-563c-45a1-b497-9bff5b69a204");
+        Domain domain = new Domain(null, null, DOMAIN_WHERE_TEST_USER_IS_A_MANAGER);
         User user = user("usr-cebc0e02-24e1-40a6-b0a5-75c10ddffb86");
         Domain result = domainService.addManagerToDomain(domain, user, token);
         assertNotNull(result);
@@ -318,8 +319,7 @@ public class ApplicationIntegrationTest {
     @Test
     public void can_get_all_managers_from_domain() {
         LOGGER.trace("[ApplicationIntegrationTest] - can_get_all_managers_from_a_domain");
-        String domainReference = "dom-0a22160b-563c-45a1-b497-9bff5b69a204";
-        Collection<User> users = domainService.getAllManagersFromDomain(domainReference, token);
+        Collection<User> users = domainService.getAllManagersFromDomain(DOMAIN_WHERE_TEST_USER_IS_A_MANAGER, token);
         assertNotNull(users);
     }
 
