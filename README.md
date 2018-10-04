@@ -31,11 +31,11 @@ By default, the client uses our 'explore' environment, which we use as a sandbox
 To switch to another environment (for example, production https://api.aai.ebi.ac.uk), add the following properties 
 (for ex, in your main `application.properties`):
 
-If you use the security module:
+If you use the service module:
 ```properties
 aap.url=https://api.aai.ebi.ac.uk
 ```
-If you use the service module:
+If you use the security module:
 ```properties
 jwt.certificate=https://api.aai.ebi.ac.uk/meta/public.der
 ```
