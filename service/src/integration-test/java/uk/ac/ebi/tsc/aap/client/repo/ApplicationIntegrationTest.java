@@ -106,21 +106,21 @@ public class ApplicationIntegrationTest {
 
     @Test(expected = TokenNotSuppliedException.class)
     public void throw_exception_on_no_token() {
-        LOGGER.trace("[ApplicationIntegrationTest] - throw_excpetion_on_no_token");
+        LOGGER.trace("[ApplicationIntegrationTest] - throw_exception_on_no_token");
         String uniqueName = "Iam not client "+ new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(new Date());
         domainService.createDomain(uniqueName, "aap client java integration test", "");
     }
 
     @Test(expected = InvalidJWTTokenException.class)
     public void throw_exception_on_invalid_token() {
-        LOGGER.trace("[ApplicationIntegrationTest] - throw_excpetion_on_no_token");
+        LOGGER.trace("[ApplicationIntegrationTest] - throw_exception_on_no_token");
         String uniqueName = "Iam not client "+ new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(new Date());
         domainService.createDomain(uniqueName, "aap client java integration test", "INVALID_TOKEN");
     }
 
     @Test(expected = TokenExpiredException.class)
     public void throw_exception_on_expired_token() {
-        LOGGER.trace("[ApplicationIntegrationTest] - throw_excpetion_on_no_token");
+        LOGGER.trace("[ApplicationIntegrationTest] - throw_exception_on_no_token");
         String expiredToken = "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Rldi5hYXAudHNpLmViaS5hYy51ay9zcCIsImV4cCI6MTUyOTU5Mjc0" +
                 "OCwianRpIjoiQWtzUWlzWVRNc21mZzllbEhZaWFwdyIsImlhdCI6MTUyOTU5MjY4OCwic3ViIjoidXNyLWQ4NzQ5YWNmLTZhMjItNDQz" +
                 "OC1hY2NjLWNjOGQxODc3YmEzNiIsImVtYWlsIjoiZW1ibC5lYmkudHNpQGdtYWlsLmNvbSIsIm5pY2tuYW1lIjoia2FybyIsIm5hbWUi" +
