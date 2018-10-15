@@ -16,6 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.tsc.aap.client.exception.AAPException;
+import uk.ac.ebi.tsc.aap.client.exception.InvalidJWTTokenException;
+import uk.ac.ebi.tsc.aap.client.exception.TokenExpiredException;
+import uk.ac.ebi.tsc.aap.client.exception.TokenNotSuppliedException;
 import uk.ac.ebi.tsc.aap.client.model.Domain;
 import uk.ac.ebi.tsc.aap.client.model.Profile;
 import uk.ac.ebi.tsc.aap.client.model.User;
@@ -23,15 +26,13 @@ import uk.ac.ebi.tsc.aap.client.model.User;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertNotNull;
-import uk.ac.ebi.tsc.aap.client.exception.TokenNotSuppliedException;
-import uk.ac.ebi.tsc.aap.client.exception.InvalidJWTTokenException;
-import uk.ac.ebi.tsc.aap.client.exception.TokenExpiredException;
 
 /**
  * Created by ukumbham on 21/08/2017.
@@ -60,6 +61,8 @@ public class ApplicationIntegrationTest {
     private static String token;
     private static String AJAY_USERNAME;
     private static String AJAY_PASSWORD;
+    private static String SEARCH_USER_NAME;
+    private static String SEARCH_USER_PASSWORD;
     public static final String DOMAIN_WHERE_TEST_USER_IS_A_MANAGER = "dom-311d5438-e546-43ce-8f91-c452a154ce5f";
 
     @BeforeClass
@@ -68,10 +71,14 @@ public class ApplicationIntegrationTest {
         String password = System.getenv("AAP_TEST_PASSWORD");
         AJAY_USERNAME = System.getenv("AAP_AJAY_USERNAME");
         AJAY_PASSWORD = System.getenv("AAP_AJAY_PASSWORD");
+        SEARCH_USER_NAME = System.getenv("AAP_SEARCH_USERNAME");
+        SEARCH_USER_PASSWORD = System.getenv("AAP_SEARCH_PASSWORD");
         assertThat("Missing environment variable AAP_TEST_USERNAME", username, notNullValue());
         assertThat("Missing environment variable AAP_TEST_PASSWORD", password, notNullValue());
         assertThat("Missing environment variable AAP_AJAY_USERNAME", AJAY_USERNAME, notNullValue());
         assertThat("Missing environment variable AAP_AJAY_PASSWORD", AJAY_PASSWORD, notNullValue());
+        assertThat("Missing environment variable AAP_SEARCH_USER_NAME", SEARCH_USER_NAME, notNullValue());
+        assertThat("Missing environment variable AAP_SEARCH_USER_PASSWORD", SEARCH_USER_PASSWORD, notNullValue());
         token = getToken(username, password);
     }
 
@@ -345,6 +352,15 @@ public class ApplicationIntegrationTest {
                                                    System.getenv("AAP_TEST_PASSWORD"));
         assertNotNull(response);
     }
+
+    @Test
+    public void can_search_user_by_attribute()throws Exception{
+        LOGGER.trace("[ApplicationIntegrationTest] - can_search_user_by_attribute");
+        String searchUserToken = getToken(SEARCH_USER_NAME, SEARCH_USER_PASSWORD);
+        List<User> searchResult = profileService.searchUsersProfileByAttribute("email","test@test.com",searchUserToken);
+        assertNotNull(searchResult);
+    }
+
 
     private static String getToken(String username, String password) {
         LOGGER.trace("Getting token");
