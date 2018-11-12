@@ -36,7 +36,7 @@ public class StatelessAuthenticationEntryPoint implements AuthenticationEntryPoi
         if(request.getAttribute("ERROR_RESPONSE")!=null){
             ErrorResponse errorResponse = (ErrorResponse)request.getAttribute("ERROR_RESPONSE");
             errorResponse.setPath(request.getRequestURI());
-            errorResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
+            errorResponse.setStatus(HttpStatus.UNAUTHORIZED.name());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json;charset=UTF-8");
             response.getWriter().write(convertObjectToJson(errorResponse));
