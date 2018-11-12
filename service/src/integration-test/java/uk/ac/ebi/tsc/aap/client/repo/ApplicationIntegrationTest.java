@@ -3,7 +3,9 @@ package uk.ac.ebi.tsc.aap.client.repo;
 import com.google.common.collect.ImmutableMap;
 import org.hamcrest.collection.IsMapContaining;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,7 +129,7 @@ public class ApplicationIntegrationTest {
 
     @Test(expected = TokenExpiredException.class)
     public void throw_exception_on_expired_token() {
-        LOGGER.trace("[ApplicationIntegrationTest] - throw_exception_on_no_token");
+        LOGGER.trace("[ApplicationIntegrationTest] - throw_exception_on_expired_token");
         String expiredToken = "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Rldi5hYXAudHNpLmViaS5hYy51ay9zcCIsImV4cCI6MTUyOTU5Mjc0" +
                 "OCwianRpIjoiQWtzUWlzWVRNc21mZzllbEhZaWFwdyIsImlhdCI6MTUyOTU5MjY4OCwic3ViIjoidXNyLWQ4NzQ5YWNmLTZhMjItNDQz" +
                 "OC1hY2NjLWNjOGQxODc3YmEzNiIsImVtYWlsIjoiZW1ibC5lYmkudHNpQGdtYWlsLmNvbSIsIm5pY2tuYW1lIjoia2FybyIsIm5hbWUi" +
@@ -194,28 +196,25 @@ public class ApplicationIntegrationTest {
         assertNotNull(users);
     }
 
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
     @Test
     public void manager_cannot_get_domain_profile() {
-        AAPException exception = null;
+        expectedException.expect(AAPException.class);
         String profileReference = "prf-746d461f-31d9-4751-8d3a-2256d03846b7";
-        try {
-            profileService.getProfile(profileReference, token);
-        } catch (AAPException e) {
-            exception = e;
-        }
-        assertThat(exception.getStatusCode(), is(HttpStatus.FORBIDDEN.value()));
+        profileService.getProfile(profileReference, token);
+        expectedException.expectMessage("Access is denied");
+        expectedException.expect(is(HttpStatus.FORBIDDEN));
     }
 
     @Test
     public void manager_cannot_get_domain_profile_by_domain_ref() {
-        AAPException exception = null;
+        expectedException.expect(AAPException.class);
         String domainReference = "dom-311d5438-e546-43ce-8f91-c452a154ce5f";
-        try {
-            profileService.getDomainProfile(domainReference, token);
-        } catch (AAPException e) {
-            exception = e;
-        }
-        assertThat(exception.getStatusCode(), is(HttpStatus.FORBIDDEN.value()));
+        profileService.getDomainProfile(domainReference, token);
+        expectedException.expectMessage("Access is denied");
+        expectedException.expect(is(HttpStatus.FORBIDDEN));
     }
 
     @Test
