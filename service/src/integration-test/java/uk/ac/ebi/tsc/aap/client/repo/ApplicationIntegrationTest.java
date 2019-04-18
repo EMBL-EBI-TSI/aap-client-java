@@ -49,6 +49,10 @@ public class ApplicationIntegrationTest {
     private static final Logger LOGGER = LoggerFactory.getLogger
             (ApplicationIntegrationTest.class);
     private static TestRestTemplate testRestTemplate = new TestRestTemplate();
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
     @Autowired
     private DomainService domainService;
 
@@ -196,26 +200,39 @@ public class ApplicationIntegrationTest {
         assertNotNull(users);
     }
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+    @Test()
+    public void user_can_see_404_status_if_domain_not_found(){
+        LOGGER.trace("[ApplicationIntegrationTest] - can_see_not_found_status_if_domain_not_found");
+        expectedException.expect(AAPException.class);
+        String notExist = "dom-0a22160b-563c-45a1-b497-9bff5b69a205";
+        Domain domain = domainService.getDomainByReference(notExist, token);
+        expectedException.expectMessage("No domain with reference");
+        expectedException.expect(is(404));
+    }
 
     @Test
-    public void manager_cannot_get_domain_profile() {
-        expectedException.expect(AAPException.class);
+    public void manager_can_get_domain_profile() {
         String profileReference = "prf-746d461f-31d9-4751-8d3a-2256d03846b7";
-        profileService.getProfile(profileReference, token);
-        expectedException.expectMessage("Access is denied");
-        expectedException.expect(is(HttpStatus.FORBIDDEN));
+        Profile profile = profileService.getProfile(profileReference, token);
+        assertThat(profile.getReference(), is("prf-746d461f-31d9-4751-8d3a-2256d03846b7"));
+        assertThat(profile.getAttributes(), IsMapContaining.hasEntry("fruit", "Banana"));
     }
 
     @Test
-    public void manager_cannot_get_domain_profile_by_domain_ref() {
+    public void manager_can_see_404_status_and_exception_if_profile_not_found(){
         expectedException.expect(AAPException.class);
-        String domainReference = "dom-311d5438-e546-43ce-8f91-c452a154ce5f";
-        profileService.getDomainProfile(domainReference, token);
-        expectedException.expectMessage("Access is denied");
-        expectedException.expect(is(HttpStatus.FORBIDDEN));
+        String notExist = "prf-746d461f-31d9-4751-8d3a-2256d03846b8";
+        Profile profile = profileService.getProfile(notExist, token);
+        expectedException.expectMessage("Profile was not found for reference");
+        expectedException.expect(is(404));
     }
+
+    @Test
+    public void manager_can_get_domain_profile_by_domain_ref() {
+        String domainReference = "dom-311d5438-e546-43ce-8f91-c452a154ce5f";
+        Profile profile = profileService.getDomainProfile(domainReference, token);
+        assertThat(profile.getAttributes(), IsMapContaining.hasEntry("fruit", "Banana"));
+     }
 
     @Test
     public void user_can_get_domain_profile_and_attributes() {
