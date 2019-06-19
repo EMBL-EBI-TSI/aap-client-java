@@ -25,7 +25,7 @@ dependencies {
 
 By default, the client uses our 'explore' environment, which we use as a sandbox for other parties integrating with us.
 To switch to another environment (for example, production https://api.aai.ebi.ac.uk), add the following properties 
-(for ex, in your main `application.properties`):
+(for example, in your main `application.properties`):
 
 If you use the service module:
 ```properties
