@@ -1,5 +1,7 @@
 package uk.ac.ebi.tsc.aap.client.exception;
 
+import org.springframework.http.HttpStatus;
+
 /**
  * Created by felix on 19/06/2018.
  * Responsible to throw custom error message
@@ -7,16 +9,16 @@ package uk.ac.ebi.tsc.aap.client.exception;
 public class AAPException extends RuntimeException {
 
     String code = "INTERNAL_ERROR";
-    int statusCode;
+    HttpStatus statusCode;
     public String getCode() {
         return code;
     }
 
-    public int getStatusCode() {
+    public HttpStatus getStatusCode() {
         return statusCode;
     }
     public AAPException(String message){ super(message); }
-    public AAPException(String message,int statusCode){
+    public AAPException(String message,HttpStatus statusCode){
         super(message);
         this.statusCode = statusCode;
     }

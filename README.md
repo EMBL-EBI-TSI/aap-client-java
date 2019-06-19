@@ -1,15 +1,13 @@
 # Java client for the EBI AAP services
 
 This is a library with common functionality to interact with the EBI's Authentication, Authorization
-and Profile service. It currently (Jan 2017) covers the authentication classes to secure rest API
-using spring.
+and Profile service. 
 
 ## Getting Started
 
 Choose which aspect of the client you'd like to use:
-- `security` helps protect your API's endpoint via a token produced by the AAP
-- `service` helps making calls to the AAP API
-
+- `security` helps protect your API's endpoints via a token produced by the AAP ([README](security/README.md)).  
+- `service` helps making calls to the AAP API ([README](service/README.md)).
 
 Include the jar as dependency to your project (for example `service` with gradle):
 
@@ -23,19 +21,17 @@ dependencies {
 }
 ```
 
-Use the provided classes to secure your API: more to come on this section soon!
-
 ### Configure which AAP environment to talk to
 
 By default, the client uses our 'explore' environment, which we use as a sandbox for other parties integrating with us.
 To switch to another environment (for example, production https://api.aai.ebi.ac.uk), add the following properties 
 (for example, in your main `application.properties`):
 
-If you use the security module:
+If you use the service module:
 ```properties
 aap.url=https://api.aai.ebi.ac.uk
 ```
-If you use the service module:
+If you use the security module:
 ```properties
 jwt.certificate=https://api.aai.ebi.ac.uk/meta/public.der
 ```
@@ -76,8 +72,6 @@ ossrhPassword=secret
 
 * Download [Gradle](https://gradle.org/gradle-download/) (if you haven't already got it...)
 * Checkout the [source code](https://github.com/EMBL-EBI-TSI/aap-client-java.git)
-
-To come next: getting a JWT from the AAP, and using it to check which domain a given user is part of.
 
 ## Running the tests
 

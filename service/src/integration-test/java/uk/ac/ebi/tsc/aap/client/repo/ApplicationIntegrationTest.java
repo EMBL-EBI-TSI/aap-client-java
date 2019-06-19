@@ -3,7 +3,9 @@ package uk.ac.ebi.tsc.aap.client.repo;
 import com.google.common.collect.ImmutableMap;
 import org.hamcrest.collection.IsMapContaining;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.tsc.aap.client.exception.AAPException;
+import uk.ac.ebi.tsc.aap.client.exception.InvalidJWTTokenException;
+import uk.ac.ebi.tsc.aap.client.exception.TokenExpiredException;
+import uk.ac.ebi.tsc.aap.client.exception.TokenNotSuppliedException;
 import uk.ac.ebi.tsc.aap.client.model.Domain;
 import uk.ac.ebi.tsc.aap.client.model.Profile;
 import uk.ac.ebi.tsc.aap.client.model.User;
@@ -23,15 +28,13 @@ import uk.ac.ebi.tsc.aap.client.model.User;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertNotNull;
-import uk.ac.ebi.tsc.aap.client.exception.TokenNotSuppliedException;
-import uk.ac.ebi.tsc.aap.client.exception.InvalidJWTTokenException;
-import uk.ac.ebi.tsc.aap.client.exception.TokenExpiredException;
 
 /**
  * Created by ukumbham on 21/08/2017.
@@ -46,6 +49,10 @@ public class ApplicationIntegrationTest {
     private static final Logger LOGGER = LoggerFactory.getLogger
             (ApplicationIntegrationTest.class);
     private static TestRestTemplate testRestTemplate = new TestRestTemplate();
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
     @Autowired
     private DomainService domainService;
 
@@ -60,6 +67,9 @@ public class ApplicationIntegrationTest {
     private static String token;
     private static String AJAY_USERNAME;
     private static String AJAY_PASSWORD;
+    private static String SEARCH_USER_NAME;
+    private static String SEARCH_USER_PASSWORD;
+    public static final String DOMAIN_WHERE_TEST_USER_IS_A_MANAGER = "dom-311d5438-e546-43ce-8f91-c452a154ce5f";
 
     @BeforeClass
     public static void setUp() {
@@ -67,10 +77,14 @@ public class ApplicationIntegrationTest {
         String password = System.getenv("AAP_TEST_PASSWORD");
         AJAY_USERNAME = System.getenv("AAP_AJAY_USERNAME");
         AJAY_PASSWORD = System.getenv("AAP_AJAY_PASSWORD");
+        SEARCH_USER_NAME = System.getenv("AAP_SEARCH_USERNAME");
+        SEARCH_USER_PASSWORD = System.getenv("AAP_SEARCH_PASSWORD");
         assertThat("Missing environment variable AAP_TEST_USERNAME", username, notNullValue());
         assertThat("Missing environment variable AAP_TEST_PASSWORD", password, notNullValue());
         assertThat("Missing environment variable AAP_AJAY_USERNAME", AJAY_USERNAME, notNullValue());
         assertThat("Missing environment variable AAP_AJAY_PASSWORD", AJAY_PASSWORD, notNullValue());
+        assertThat("Missing environment variable AAP_SEARCH_USER_NAME", SEARCH_USER_NAME, notNullValue());
+        assertThat("Missing environment variable AAP_SEARCH_USER_PASSWORD", SEARCH_USER_PASSWORD, notNullValue());
         token = getToken(username, password);
     }
 
@@ -104,22 +118,22 @@ public class ApplicationIntegrationTest {
     }
 
     @Test(expected = TokenNotSuppliedException.class)
-    public void throw_excpetion_on_no_token() {
-        LOGGER.trace("[ApplicationIntegrationTest] - throw_excpetion_on_no_token");
+    public void throw_exception_on_no_token() {
+        LOGGER.trace("[ApplicationIntegrationTest] - throw_exception_on_no_token");
         String uniqueName = "Iam not client "+ new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(new Date());
         domainService.createDomain(uniqueName, "aap client java integration test", "");
     }
 
     @Test(expected = InvalidJWTTokenException.class)
-    public void throw_excpetion_on_invalid_token() {
-        LOGGER.trace("[ApplicationIntegrationTest] - throw_excpetion_on_no_token");
+    public void throw_exception_on_invalid_token() {
+        LOGGER.trace("[ApplicationIntegrationTest] - throw_exception_on_no_token");
         String uniqueName = "Iam not client "+ new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(new Date());
         domainService.createDomain(uniqueName, "aap client java integration test", "INVALID_TOKEN");
     }
 
     @Test(expected = TokenExpiredException.class)
-    public void throw_excpetion_on_expired_token() {
-        LOGGER.trace("[ApplicationIntegrationTest] - throw_excpetion_on_no_token");
+    public void throw_exception_on_expired_token() {
+        LOGGER.trace("[ApplicationIntegrationTest] - throw_exception_on_expired_token");
         String expiredToken = "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Rldi5hYXAudHNpLmViaS5hYy51ay9zcCIsImV4cCI6MTUyOTU5Mjc0" +
                 "OCwianRpIjoiQWtzUWlzWVRNc21mZzllbEhZaWFwdyIsImlhdCI6MTUyOTU5MjY4OCwic3ViIjoidXNyLWQ4NzQ5YWNmLTZhMjItNDQz" +
                 "OC1hY2NjLWNjOGQxODc3YmEzNiIsImVtYWlsIjoiZW1ibC5lYmkudHNpQGdtYWlsLmNvbSIsIm5pY2tuYW1lIjoia2FybyIsIm5hbWUi" +
@@ -186,29 +200,39 @@ public class ApplicationIntegrationTest {
         assertNotNull(users);
     }
 
-    @Test
-    public void manager_cannot_get_domain_profile() {
-        AAPException exception = null;
-        String profileReference = "prf-746d461f-31d9-4751-8d3a-2256d03846b7";
-        try {
-            profileService.getProfile(profileReference, token);
-        } catch (AAPException e) {
-            exception = e;
-        }
-        assertThat(exception.getStatusCode(), is(HttpStatus.FORBIDDEN.value()));
+    @Test()
+    public void user_can_see_404_status_if_domain_not_found(){
+        LOGGER.trace("[ApplicationIntegrationTest] - can_see_not_found_status_if_domain_not_found");
+        expectedException.expect(AAPException.class);
+        String notExist = "dom-0a22160b-563c-45a1-b497-9bff5b69a205";
+        Domain domain = domainService.getDomainByReference(notExist, token);
+        expectedException.expectMessage("No domain with reference");
+        expectedException.expect(is(404));
     }
 
     @Test
-    public void manager_cannot_get_domain_profile_by_domain_ref() {
-        AAPException exception = null;
-        String domainReference = "dom-311d5438-e546-43ce-8f91-c452a154ce5f";
-        try {
-            profileService.getDomainProfile(domainReference, token);
-        } catch (AAPException e) {
-            exception = e;
-        }
-        assertThat(exception.getStatusCode(), is(HttpStatus.FORBIDDEN.value()));
+    public void manager_can_get_domain_profile() {
+        String profileReference = "prf-746d461f-31d9-4751-8d3a-2256d03846b7";
+        Profile profile = profileService.getProfile(profileReference, token);
+        assertThat(profile.getReference(), is("prf-746d461f-31d9-4751-8d3a-2256d03846b7"));
+        assertThat(profile.getAttributes(), IsMapContaining.hasEntry("fruit", "Banana"));
     }
+
+    @Test
+    public void manager_can_see_404_status_and_exception_if_profile_not_found(){
+        expectedException.expect(AAPException.class);
+        String notExist = "prf-746d461f-31d9-4751-8d3a-2256d03846b8";
+        Profile profile = profileService.getProfile(notExist, token);
+        expectedException.expectMessage("Profile was not found for reference");
+        expectedException.expect(is(404));
+    }
+
+    @Test
+    public void manager_can_get_domain_profile_by_domain_ref() {
+        String domainReference = "dom-311d5438-e546-43ce-8f91-c452a154ce5f";
+        Profile profile = profileService.getDomainProfile(domainReference, token);
+        assertThat(profile.getAttributes(), IsMapContaining.hasEntry("fruit", "Banana"));
+     }
 
     @Test
     public void user_can_get_domain_profile_and_attributes() {
@@ -288,7 +312,7 @@ public class ApplicationIntegrationTest {
     @Test
     public void can_add_user_to_a_domain() {
         LOGGER.trace("[ApplicationIntegrationTest] - can_add_user_to_a_domain-"+token);
-        Domain domain = new Domain(null, null, "dom-0a22160b-563c-45a1-b497-9bff5b69a204");
+        Domain domain = new Domain(null, null, DOMAIN_WHERE_TEST_USER_IS_A_MANAGER);
         User user = user("usr-cebc0e02-24e1-40a6-b0a5-75c10ddffb86");
         Domain result = domainService.addUserToDomain(domain, user, token);
         assertNotNull(result);
@@ -299,7 +323,7 @@ public class ApplicationIntegrationTest {
     @Test
     public void can_add_manager_to_a_domain() {
         LOGGER.trace("[ApplicationIntegrationTest] - can_add_manager_to_a_domain-"+token);
-        Domain domain = new Domain(null, null, "dom-0a22160b-563c-45a1-b497-9bff5b69a204");
+        Domain domain = new Domain(null, null, DOMAIN_WHERE_TEST_USER_IS_A_MANAGER);
         User user = user("usr-cebc0e02-24e1-40a6-b0a5-75c10ddffb86");
         Domain result = domainService.addManagerToDomain(domain, user, token);
         assertNotNull(result);
@@ -318,8 +342,7 @@ public class ApplicationIntegrationTest {
     @Test
     public void can_get_all_managers_from_domain() {
         LOGGER.trace("[ApplicationIntegrationTest] - can_get_all_managers_from_a_domain");
-        String domainReference = "dom-0a22160b-563c-45a1-b497-9bff5b69a204";
-        Collection<User> users = domainService.getAllManagersFromDomain(domainReference, token);
+        Collection<User> users = domainService.getAllManagersFromDomain(DOMAIN_WHERE_TEST_USER_IS_A_MANAGER, token);
         assertNotNull(users);
     }
 
@@ -345,6 +368,15 @@ public class ApplicationIntegrationTest {
                                                    System.getenv("AAP_TEST_PASSWORD"));
         assertNotNull(response);
     }
+
+    @Test
+    public void can_search_user_by_attribute()throws Exception{
+        LOGGER.trace("[ApplicationIntegrationTest] - can_search_user_by_attribute");
+        String searchUserToken = getToken(SEARCH_USER_NAME, SEARCH_USER_PASSWORD);
+        List<User> searchResult = profileService.searchUsersProfileByAttribute("email","test@test.com",searchUserToken);
+        assertNotNull(searchResult);
+    }
+
 
     private static String getToken(String username, String password) {
         LOGGER.trace("Getting token");
