@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-	compile( group: 'uk.ac.ebi.tsc.aap.client', name: 'service', version: '1.0.2-SNAPSHOT')
+	compile( group: 'uk.ac.ebi.tsc.aap.client', name: 'service', version: '1.0.6-SNAPSHOT')
 }
 ```
 

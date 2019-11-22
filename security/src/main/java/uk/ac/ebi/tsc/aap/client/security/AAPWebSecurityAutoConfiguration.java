@@ -40,6 +40,9 @@ public class AAPWebSecurityAutoConfiguration {
         private static final Logger LOGGER = LoggerFactory.getLogger(AAPWebSecurityConfig.class);
 
         @Autowired
+        private CorsFilterProperties corsFilterProperties;
+
+        @Autowired
         private StatelessAuthenticationEntryPoint unauthorizedHandler;
 
         @Autowired
@@ -65,6 +68,11 @@ public class AAPWebSecurityAutoConfiguration {
                     UsernamePasswordAuthenticationFilter.class);
             // disable page caching
             httpSecurity.headers().cacheControl();
+
+            if (corsFilterProperties.isEnabled()) {
+                LOGGER.trace("Adding CORS Filter");
+                httpSecurity.cors();
+            }
         }
 
         @Autowired
