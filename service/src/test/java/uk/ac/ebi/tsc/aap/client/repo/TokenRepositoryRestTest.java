@@ -4,13 +4,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.web.client.HttpServerErrorException;
 import uk.ac.ebi.tsc.aap.client.exception.UserNameOrPasswordWrongException;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -23,9 +22,9 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
  * Created by ukumbham on 22/09/2017.
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes= TokenRepositoryRest.class)
+@ContextConfiguration(classes= TokenRepositoryRest.class)
 @RestClientTest(TokenRepositoryRest.class)
-@TestPropertySource(properties = {"aap.domains.url=somewhere", "aap.timeout=5000"})
+@TestPropertySource(properties = {"aap.domains.url=/somewhere", "aap.timeout=5000"})
 public class TokenRepositoryRestTest {
 
     @Autowired

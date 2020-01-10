@@ -4,38 +4,34 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
+import uk.ac.ebi.tsc.aap.client.exception.InvalidJWTTokenException;
+import uk.ac.ebi.tsc.aap.client.exception.TokenExpiredException;
+import uk.ac.ebi.tsc.aap.client.exception.TokenNotSuppliedException;
 import uk.ac.ebi.tsc.aap.client.model.Domain;
 import uk.ac.ebi.tsc.aap.client.model.User;
+
 import java.util.Collection;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
 import static uk.ac.ebi.tsc.aap.client.test.TimeoutResponseCreator.withTimeout;
-import uk.ac.ebi.tsc.aap.client.exception.TokenNotSuppliedException;
-import uk.ac.ebi.tsc.aap.client.exception.InvalidJWTTokenException;
-import uk.ac.ebi.tsc.aap.client.exception.TokenExpiredException;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes=DomainRepositoryRest.class)
+//@SpringBootTest(classes=DomainRepositoryRest.class)
 @RestClientTest(DomainRepositoryRest.class)
-@TestPropertySource(properties = {"aap.domains.url=somewhere", "aap.timeout=5000"})
+@ContextConfiguration(classes=DomainRepositoryRest.class)
+@TestPropertySource(properties = {"aap.domains.url=/somewhere", "aap.timeout=5000"})
 public class DomainRepositoryRestTest {
 
 	@Autowired

@@ -11,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import uk.ac.ebi.tsc.aap.client.model.Profile;
 import uk.ac.ebi.tsc.aap.client.model.User;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -31,8 +32,8 @@ public class ProfileRepositoryRest implements ProfileRepository {
             RestTemplateBuilder clientBuilder) {
         this.template = clientBuilder
                 .rootUri(domainsApiUrl)
-                .setConnectTimeout(timeout)
-                .setReadTimeout(timeout)
+                .setConnectTimeout(Duration.ofMillis(timeout))
+                .setReadTimeout(Duration.ofMillis(timeout))
                 .errorHandler(new AAPResponseErrorHandler())
                 .build();
     }

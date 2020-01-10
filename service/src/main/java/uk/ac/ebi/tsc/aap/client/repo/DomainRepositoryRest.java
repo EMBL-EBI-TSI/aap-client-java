@@ -5,12 +5,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import uk.ac.ebi.tsc.aap.client.model.Domain;
 import uk.ac.ebi.tsc.aap.client.model.User;
+
+import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 
@@ -30,10 +34,9 @@ public class DomainRepositoryRest implements DomainRepository {
             @Value("${aap.timeout:180000}") int timeout,
             RestTemplateBuilder clientBuilder) {
         this.template = clientBuilder
-                .requestFactory(new HttpComponentsClientHttpRequestFactory())
                 .rootUri(domainsApiUrl)
-                .setConnectTimeout(timeout)
-                .setReadTimeout(timeout)
+                .setConnectTimeout(Duration.ofMillis(timeout))
+                .setReadTimeout(Duration.ofMillis(timeout))
                 .errorHandler(new AAPResponseErrorHandler())
                 .build();
     }
