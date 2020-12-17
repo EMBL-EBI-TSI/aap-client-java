@@ -23,6 +23,8 @@ public class User implements Serializable, UserDetails {
     private String fullName;
     private Set<Domain> domains;
     private String organization;
+    // Performs same function as identical property in org.springframework.security.core.userdetails.User
+    private boolean accountNonLocked;
 
     /**
      * @see User#builder()
@@ -30,6 +32,23 @@ public class User implements Serializable, UserDetails {
     @Deprecated
     public User(){}
 
+    /**
+     * Partially initialising constructor.
+     * <p>
+     * It's important to note that this constructor does not assign a value to {@code accountNonLocked}
+     * and therefore constructs {@code User} objects which are represented with their accounts in a
+     * <b>locked</b> state.<br>
+     * This "partial" construction may be necessary on an API endpoint receiving a JWT token, which
+     * does not convey account state information, and may necessitate the true account state needing
+     * to be updated using {@link #setAccountNonLocked(boolean)}.
+     * 
+     * @param userName
+     * @param email
+     * @param userReference
+     * @param fullName
+     * @param domains
+     * @see User#User(String, String, String, String, Set, boolean)
+     */
     public User(String userName, String email, String userReference, String fullName, Set<Domain> domains) {
         this.userName = userName;
         this.email = email;
@@ -38,6 +57,13 @@ public class User implements Serializable, UserDetails {
         this.domains = domains;
     }
 
+    /**
+     * Retrieve the name which the user supplied.
+     * <p>
+     * If you want the user's reference for {@link UserDetails} purposes, use {@link #getUsername()}!
+     * 
+     * @return User's supplied user name (i.e. not their full name, reference or nickname).
+     */
     public String getUserName() {
         return userName;
     }
@@ -80,6 +106,31 @@ public class User implements Serializable, UserDetails {
         return domains;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isAccountNonLocked() {
+        return accountNonLocked;
+    }
+
+    /**
+     * Assign account non-locked status.
+     * 
+     * @param accountNonLocked {@code true} to set account as not locked, otherwise {@code false}.
+     */
+    public void setAccountNonLocked(boolean accountNonLocked) {
+        this.accountNonLocked = accountNonLocked;
+    }
+
+    
+    @Override
+    public String toString() {
+        return "User [userName=" + userName + ", email=" + email + ", userReference=" + userReference + ", fullName="
+                + fullName + ", domains=" + domains + ", organization=" + organization + ", accountNonLocked="
+                + accountNonLocked + "]";
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -114,6 +165,7 @@ public class User implements Serializable, UserDetails {
 
     @JsonIgnore
     @Override
+    // Not to be confused with getUserName() -- this is overriding UserDetails#getUsername()!
     public String getUsername() {
         return userReference;
     }
@@ -124,12 +176,6 @@ public class User implements Serializable, UserDetails {
     @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @JsonIgnore
-    @Override
-    public boolean isAccountNonLocked() {
         return true;
     }
 
@@ -199,6 +245,17 @@ public class User implements Serializable, UserDetails {
             Set<Domain> domains = new HashSet<>();
             Arrays.asList(domainNames).forEach(name->domains.add(Domain.builder().withName(name).build()));
             user.setDomains(domains);
+            return this;
+        }
+
+        /**
+         * Assign account non-locked status.
+         * 
+         * @param accountNonLocked {@code true} to set account as not locked, otherwise {@code false}.
+         * @return Builder
+         */
+        public Builder withAccountNonLocked(final boolean accountNonLocked) {
+            user.setAccountNonLocked(accountNonLocked);
             return this;
         }
 
