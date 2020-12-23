@@ -9,8 +9,6 @@ import java.util.Set;
 
 /**
  * Data model for an AAP profile.
- * <p>
- * 
  */
 public class Profile {
 
