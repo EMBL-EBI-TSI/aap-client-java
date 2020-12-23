@@ -15,6 +15,9 @@ import java.util.Set;
  */
 public class User implements Serializable, UserDetails {
 
+    /** Label for consistent referencing (e.g. in profile attribute assignment) */
+    public static final String PROPERTY_NAME_ACCOUNT_NON_LOCKED = "accountNonLocked";
+
     private static final long serialVersionUID = 1L;
 
     private String userName;

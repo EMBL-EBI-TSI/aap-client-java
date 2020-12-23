@@ -8,7 +8,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Data model for an AAP profile
+ * Data model for an AAP profile.
+ * <p>
+ * 
  */
 public class Profile {
 
@@ -36,6 +38,14 @@ public class Profile {
         return reference;
     }
 
+    /**
+     * Retrieve a potentially <b>partial</b> representation of the profile's {@link User}.
+     * <p>
+     * The assigned user may not be a full and complete representation, i.e. it may only have a
+     * valid {@link User#getUserReference()} property.
+     * 
+     * @return Profile user or {@code null} if not assigned.
+     */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public User getUser() {
         return user;
@@ -117,6 +127,13 @@ public class Profile {
             return this;
         }
 
+        /**
+         * This will create and assign a {@link User} with only a {@link User#setUserReference(String)}
+         * assignment, i.e. the resultant {@code User} is unrepresentative of the actual user.
+         * 
+         * @param userReference User reference, or {@code null}.
+         * @return Builder.
+         */
         public Builder withUser(String userReference) {
             if (userReference != null) {
                 profile.user = User.builder().withReference(userReference).build();
