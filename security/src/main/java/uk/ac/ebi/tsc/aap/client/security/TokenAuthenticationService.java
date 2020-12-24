@@ -8,7 +8,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import uk.ac.ebi.tsc.aap.client.model.User;
 import javax.servlet.http.HttpServletRequest;
-import uk.ac.ebi.tsc.aap.client.exception.TokenNotSuppliedException;
+
+import uk.ac.ebi.tsc.aap.client.exception.InvalidJWTTokenException;
+import uk.ac.ebi.tsc.aap.client.exception.TokenExpiredException;
 
 /**
  * Extracts user authentication details from HTTP request
@@ -29,7 +31,17 @@ public class TokenAuthenticationService {
         this.tokenHandler = tokenHandler;
     }
 
-    public Authentication getAuthentication(HttpServletRequest request)   {
+    /**
+     * Retrieve the {@link Authentication} object from a request header {@value #TOKEN_HEADER_KEY},
+     * {@value #TOKEN_HEADER_VALUE_PREFIX} content value.
+     * 
+     * @param request Servlet request.
+     * @return {@linkplain Authentication} object, or {@code null} if not found.
+     * @throws InvalidJWTTokenException If problems processing token.
+     * @throws TokenExpiredException If token has expired.
+     */
+    public Authentication getAuthentication(HttpServletRequest request)
+                                            throws InvalidJWTTokenException, TokenExpiredException {
         LOGGER.trace("getAuthentication");
         final String token = extractToken(request);
         if (token == null)
