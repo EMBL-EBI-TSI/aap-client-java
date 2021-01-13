@@ -25,7 +25,7 @@ public interface SecurityLogger {
      * @param actionOn Person/Mechanism receiving the action (or {@code null} if on self)
      * @param actionOnId Identifier (e.g. {@code usr-<UUID>}, or class name if application)
      *                   of {@code actionOn}, e.g. {@code usr-<UUID>}, or {@code null} if on self.
-     * @param details Further information.
+     * @param additionalData Further information.
      */
     void logAction(Severity severity, Action action, Actor actionBy, String actionById,
                    Actor actionOn, String actionOnId, Map<String, Object> additionalData);
@@ -38,7 +38,7 @@ public interface SecurityLogger {
      * @param actionBy Person/Mechanism performing the action.
      * @param actionById Identifier (e.g. {@code usr-<UUID>}, or class name if application)
      *                   of {@code actionBy} (or class name if application).
-     * @param details Further information.
+     * @param additionalData Further information.
      */
     void logActionOnSelf(Severity severity, Action action, Actor actionBy, String actionById,
                          Map<String, Object> additionalData);

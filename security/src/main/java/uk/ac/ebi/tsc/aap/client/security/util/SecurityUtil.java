@@ -15,7 +15,7 @@ public class SecurityUtil {
 
     private SecurityUtil() {}
 
-    // https://docs.spring.io/spring-security/site/docs/4.0.x/reference/html/new.html
+    // Note: Info regarding Spring 4 change in use of ROLE_ in https://docs.spring.io/spring-security/site/docs/4.0.x/reference/html/new.html
     public static final String AAP_ADMIN_ROLE = "ROLE_aap.admin";
 
     /**

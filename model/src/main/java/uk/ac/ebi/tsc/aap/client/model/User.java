@@ -12,11 +12,15 @@ import java.util.Set;
 
 /**
  * Data model for an AAP user
+ * <p>
+ * It's important to note that this class implements {@link UserDetails} and as such exposes some
+ * AAP-specific properties as Spring Security authentication properties, e.g. :
+ * <ul>
+ *   <li>AAP {@code User#userReference} -> Spr. Sec. {@link UserDetails#getUsername()}</li>
+ *   <li>AAP {@code User#domains} -> Spr. Sec. {@link UserDetails#getAuthorities()}</li>
+ * </ul>
  */
 public class User implements Serializable, UserDetails {
-
-    /** Label for consistent referencing (e.g. in profile attribute assignment) */
-    public static final String PROPERTY_NAME_ACCOUNT_NON_LOCKED = "accountNonLocked";
 
     private static final long serialVersionUID = 1L;
 
@@ -61,11 +65,16 @@ public class User implements Serializable, UserDetails {
     }
 
     /**
-     * Retrieve the name which the user supplied.
+     * Depending on whether this is a local or federated account, this will retrieve :
+     * <ul>
+     *   <li>Federated account : An identifier provided by the federating system</li>
+     *   <li>Local account: The user's chosen (i.e. login) name</li>
+     * </ul>
      * <p>
      * If you want the user's reference for {@link UserDetails} purposes, use {@link #getUsername()}!
      * 
-     * @return User's supplied user name (i.e. not their full name, reference or nickname).
+     * @return User's supplied user name (i.e. not their full name, reference or nickname) if a
+     *         local account, otherwise the federated account identifier.
      */
     public String getUserName() {
         return userName;
@@ -155,6 +164,14 @@ public class User implements Serializable, UserDetails {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * In the case of {@code aap-client-java} the authorities are represented by the User's
+     * {@link #domains}.
+     * 
+     * @see User#getDomains()
+     */
     @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

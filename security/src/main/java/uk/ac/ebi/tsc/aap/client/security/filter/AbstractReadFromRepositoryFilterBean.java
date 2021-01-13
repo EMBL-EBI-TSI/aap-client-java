@@ -1,4 +1,4 @@
-package uk.ac.ebi.tsc.aap.client.security.repo;
+package uk.ac.ebi.tsc.aap.client.security.filter;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.util.Assert;
 import org.springframework.web.filter.GenericFilterBean;
 
 import uk.ac.ebi.tsc.aap.client.security.UserAuthentication;
@@ -21,6 +22,7 @@ import uk.ac.ebi.tsc.aap.client.security.audit.Action;
 import uk.ac.ebi.tsc.aap.client.security.audit.Actor;
 import uk.ac.ebi.tsc.aap.client.security.audit.SecurityLogger;
 import uk.ac.ebi.tsc.aap.client.security.audit.Severity;
+import uk.ac.ebi.tsc.aap.client.security.repo.GenericUserRepository;
 import uk.ac.ebi.tsc.aap.client.security.util.SecurityUtil;
 
 /**
@@ -35,6 +37,7 @@ import uk.ac.ebi.tsc.aap.client.security.util.SecurityUtil;
  */
 public abstract class AbstractReadFromRepositoryFilterBean extends GenericFilterBean {
 
+    // "Token-authenticated" in messages provides some additional detail in logs.
     private static final String exceptionMsgAccountLocked = "Token-authenticated user %s has locked account";
     private static final String exceptionMsgUserNotFound = "Token-authenticated user %s not found in repository";
 
@@ -54,6 +57,9 @@ public abstract class AbstractReadFromRepositoryFilterBean extends GenericFilter
      */
     protected AbstractReadFromRepositoryFilterBean(final SecurityLogger securityLogger,
                                                    final GenericUserRepository userRepository) {
+        Assert.notNull(securityLogger, "Security Logger must not be null.");
+        Assert.notNull(userRepository, "User Repository must not be null.");
+
         this.securityLogger = securityLogger;
         this.userRepository = userRepository;
     }
@@ -75,7 +81,13 @@ public abstract class AbstractReadFromRepositoryFilterBean extends GenericFilter
 
         if (authentication != null &&
             (authentication instanceof UserAuthentication)) {
-            loadUserDetails(authentication);
+            try {
+                loadUserDetails(authentication);
+            } catch (final LockedException lockedException) {
+                // as StatelessAuthenticationFilter!
+            } catch (final UsernameNotFoundException usernameNotFoundException) {
+                // as 
+            }
         } else {
             // Request not requiring post-token authentication -- let it pass through.
             logger.trace("~doFilter() : Not reading user repo -- Authentication is {}", authentication);

@@ -40,7 +40,7 @@ public class Profile {
      * Retrieve a potentially <b>partial</b> representation of the profile's {@link User}.
      * <p>
      * The assigned user may not be a full and complete representation, i.e. it may only have a
-     * valid {@link User#getUserReference()} property.
+     * valid {@link User#getUserReference()} and {@link User#isAccountNonLocked()} property.
      * 
      * @return Profile user or {@code null} if not assigned.
      */
@@ -89,6 +89,31 @@ public class Profile {
     @JsonIgnore
     public String getUserReference() {
         return this.user != null ? this.user.getUserReference() : null;
+    }
+
+    /**
+     * Retrieve the user profile user's {@code accountNonLocked} value.
+     * 
+     * @return {@code true} if account not locked, otherwise {@code false} if locked.
+     * @throws IllegalStateException If this method is called when not a User profile.
+     * @see #isUserProfile()
+     */
+    @JsonIgnore
+    public boolean retrieveUserAccountNonLocked() throws IllegalStateException {
+        if (!isUserProfile()) {
+            throw new IllegalStateException("Inappropriate internal system call made on a Domain Profile object");
+        }
+        return getUser().isAccountNonLocked(); 
+    }
+
+    /**
+     * Indicate if the profile is a user profile.
+     * 
+     * @return {@code true} if a user profile, otherwise {@code false}.
+     */
+    @JsonIgnore
+    public boolean isUserProfile() {
+        return (getUser() != null && getUser().getUserReference() != null);
     }
 
     public static Builder builder() {
