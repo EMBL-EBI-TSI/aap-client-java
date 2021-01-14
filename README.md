@@ -29,7 +29,7 @@ Use the provided classes to secure your API: more to come on this section soon!
 
 By default, the client uses our 'explore' environment, which we use as a sandbox for other parties integrating with us.
 To switch to another environment (for example, production https://api.aai.ebi.ac.uk), add the following properties 
-(for example, in your main `application.properties`):
+(for ex, in your main `application.properties`):
 
 If you use the security module:
 ```properties
