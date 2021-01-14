@@ -1,13 +1,10 @@
 package uk.ac.ebi.tsc.aap.client.repo;
 
 import uk.ac.ebi.tsc.aap.client.model.Profile;
-import uk.ac.ebi.tsc.aap.client.model.User;
 
-import java.util.List;
 import java.util.Map;
 
 public interface ProfileRepository {
-
     Profile createProfile(Profile profile, String token);
 
     Profile getProfile(String profileReference, String token);
@@ -27,7 +24,4 @@ public interface ProfileRepository {
     Profile getDomainProfile(String domainReference, String token);
 
     String getDomainProfileAttribute(String domainReference, String attributeName, String token);
-
-    List<User> searchUsersProfileByAttribute(String key, String value, String token);
-
 }

@@ -7,19 +7,26 @@ public class ErrorResponse implements Serializable {
 
     private static final long serialVersionUID = 131231231;
 
-    String timestamp;
-    String status;
+    Long timestamp;
+    int status;
     String error;
     String message;
     String path;
     String exception;
 
+    public Long getTimestamp() {
+        return timestamp;
+    }
 
-    public String getStatus() {
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public int getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 
@@ -55,17 +62,9 @@ public class ErrorResponse implements Serializable {
         this.exception = exception;
     }
 
-    public String getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public ErrorResponse() {
+    public ErrorResponse(){
         this.message = "";
         this.error = "UNKNOWN";
-        this.timestamp = new Timestamp(System.currentTimeMillis()).toString();
+        this.timestamp = new Timestamp(System.currentTimeMillis()).getTime();
     }
 }

@@ -50,6 +50,7 @@ public class AAPWebSecurityAutoConfiguration {
 
         private StatelessAuthenticationFilter statelessAuthenticationFilterBean() throws Exception {
             LOGGER.trace("TokenAuthenticationService: {}", this.tokenAuthenticationService);
+            LOGGER.trace("TokenAuthenticationService: {}", this.tokenAuthenticationService);
             return new StatelessAuthenticationFilter(this.tokenAuthenticationService);
         }
 
