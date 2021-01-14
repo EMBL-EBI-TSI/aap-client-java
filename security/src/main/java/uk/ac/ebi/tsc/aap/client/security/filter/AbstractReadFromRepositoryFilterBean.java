@@ -11,12 +11,14 @@ import javax.servlet.ServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.Assert;
 import org.springframework.web.filter.GenericFilterBean;
 
+import uk.ac.ebi.tsc.aap.client.exception.AAPLockedException;
+import uk.ac.ebi.tsc.aap.client.exception.AAPUsernameNotFoundException;
+import uk.ac.ebi.tsc.aap.client.model.ErrorResponse;
 import uk.ac.ebi.tsc.aap.client.security.UserAuthentication;
 import uk.ac.ebi.tsc.aap.client.security.audit.Action;
 import uk.ac.ebi.tsc.aap.client.security.audit.Actor;
@@ -66,27 +68,42 @@ public abstract class AbstractReadFromRepositoryFilterBean extends GenericFilter
 
     /**
      * {@inheritDoc}
-     * 
-     * @throws LockedException If token-presenting user has a locked account.
-     * @throws UsernameNotFoundException If token-authenticated user is not found in the repository.
      */
-    // TODO : Ensure all calling code handles LockedException and UsernameNotFoundException
     @Override
     public void doFilter(final ServletRequest request, final ServletResponse response,
                          final FilterChain chain)
-                         throws IOException, ServletException, LockedException,
-                                UsernameNotFoundException {
+                         throws IOException, ServletException {
         logger.trace("~doFilter() : Invoked by {} ", SecurityUtil.retrieveAuthenticatedName());
         final Authentication authentication = SecurityUtil.retrieveAuthentication();
 
         if (authentication != null &&
             (authentication instanceof UserAuthentication)) {
+            ErrorResponse errorResponse = null;
             try {
                 loadUserDetails(authentication);
-            } catch (final LockedException lockedException) {
-                // as StatelessAuthenticationFilter!
-            } catch (final UsernameNotFoundException usernameNotFoundException) {
-                // as 
+            } catch (final AAPLockedException lockedException) {
+                // Follow token exception handling technique
+                errorResponse = new ErrorResponse();
+                errorResponse.setError(AAPLockedException.CODE_ACCOUNT_LOCKED);
+                errorResponse.setMessage(lockedException.getMessage());
+                errorResponse.setException(lockedException.getClass().getCanonicalName());
+            } catch (final AAPUsernameNotFoundException usernameNotFoundException) {
+                // Follow token exception handling technique
+                errorResponse = new ErrorResponse();
+                errorResponse.setError(AAPUsernameNotFoundException.CODE_USERNAME_NOT_FOUND);
+                errorResponse.setMessage(usernameNotFoundException.getMessage());
+                errorResponse.setException(usernameNotFoundException.getClass().getCanonicalName());
+            } finally {
+                if (errorResponse != null) {
+                    request.setAttribute("ERROR_RESPONSE", errorResponse);
+                    /* Empty the authentication object from the filter chain.
+                     * This should result in AnonymousAuthenticationFilter (probably further down
+                     * the filter chain) creating an AnonymousAuthenticationToken, which will ensure
+                     * that any access requiring authentication will be denied and the request
+                     * will be sent to the authentication entry point (hopefully 
+                     * StatelessAuthenticationEntryPoint). */
+                    SecurityContextHolder.getContext().setAuthentication(null);
+                }
             }
         } else {
             // Request not requiring post-token authentication -- let it pass through.
@@ -100,11 +117,11 @@ public abstract class AbstractReadFromRepositoryFilterBean extends GenericFilter
      * Perform the loading of persisted user details into the passed authentication object.
      * 
      * @param authentication Non-{@code null} {@link Authentication} object to load details into.
-     * @throws LockedException If token-presenting user has a locked account.
-     * @throws UsernameNotFoundException If token-authenticated user is not found in the repository.
+     * @throws AAPLockedException If token-presenting user has a locked account.
+     * @throws AAPUsernameNotFoundException If token-authenticated user is not found in the repository.
      */
     protected abstract void loadUserDetails(Authentication authentication)
-                                            throws LockedException, UsernameNotFoundException;
+                                            throws AAPLockedException, AAPUsernameNotFoundException;
 
     /**
      * Retrieve the autowired security logger.
@@ -133,29 +150,29 @@ public abstract class AbstractReadFromRepositoryFilterBean extends GenericFilter
 
     /**
      * Logs the locked account situation in the security logging and throws a
-     * {@link LockedException}
+     * {@link AAPLockedException}
      * 
      * @param userIdentifier Identification used to retrieve user from repository.
-     * @throws LockedException In all circumstances.
+     * @throws AAPLockedException In all circumstances.
      */
     protected void logAndThrowAccountLocked(final String userIdentifier)
-                                            throws LockedException {
+                                            throws AAPLockedException {
         final String message = String.format(exceptionMsgAccountLocked, userIdentifier);
         logSecurity(message, userIdentifier);
-        throw new LockedException(message);
+        throw new AAPLockedException(message);
     }
 
     /**
      * Logs the a user not found situation in the security logging and throws a
-     * {@link UsernameNotFoundException}.
+     * {@link AAPUsernameNotFoundException}.
      * 
      * @param userIdentifier Identification used to retrieve user from repository.
-     * @throws UsernameNotFoundException In all circumstances.
+     * @throws AAPUsernameNotFoundException In all circumstances.
      */
     protected void logAndThrowUsernameNotFound(final String userIdentifier)
-                                               throws UsernameNotFoundException {
+                                               throws AAPUsernameNotFoundException {
         final String message = String.format(exceptionMsgUserNotFound, userIdentifier);
         logSecurity(message, userIdentifier);
-        throw new UsernameNotFoundException(message);
+        throw new AAPUsernameNotFoundException(message);
     }
 }
