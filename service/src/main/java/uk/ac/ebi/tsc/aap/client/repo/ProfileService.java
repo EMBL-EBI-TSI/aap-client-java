@@ -2,7 +2,9 @@ package uk.ac.ebi.tsc.aap.client.repo;
 
 import org.springframework.stereotype.Component;
 import uk.ac.ebi.tsc.aap.client.model.Profile;
+import uk.ac.ebi.tsc.aap.client.model.User;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -75,4 +77,10 @@ public class ProfileService {
     public String getDomainProfileAttribute(String domainReference, String attributeName, String token) {
         return this.repo.getDomainProfileAttribute(domainReference, attributeName, token);
     }
+
+    public List<User> searchUsersProfileByAttribute(String key, String value, String token){
+        return this.repo.searchUsersProfileByAttribute(key, value,token);
+    }
+
+
 }

@@ -2,13 +2,16 @@ package uk.ac.ebi.tsc.aap.client.repo;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import uk.ac.ebi.tsc.aap.client.model.Profile;
+import uk.ac.ebi.tsc.aap.client.model.User;
 
+import java.util.List;
 import java.util.Map;
 
 import static uk.ac.ebi.tsc.aap.client.util.TokenHeaderBuilder.createHeaders;
@@ -128,6 +131,22 @@ public class ProfileRepositoryRest implements ProfileRepository {
         return response.getBody();
     }
 
+    /**
+     * Handles search operation- accepts rest calls from consumers,contacts profiles
+     * rest api and returns the result to the consumer.
+     * @param key - Attribute name like email,name,postcode..etc
+     * @param value- Attribute value like test@test.com,tester,CB236FW..etc
+     * @param token - Bearer token
+     * @return attribute matched list of user objects - List<User></User>
+     */
+    @Override
+    public List<User> searchUsersProfileByAttribute(String key, String value, String token) {
+        HttpEntity<?> httpEntity = new HttpEntity<>(null, createHeaders(token));
+        ResponseEntity<List<User>> response = template.exchange(
+                "/users/profile/{key}?value={value}",
+                HttpMethod.GET, httpEntity, new ParameterizedTypeReference<List<User>>() {},key,value);
+        return response.getBody();
+    }
 }
 
 
