@@ -12,7 +12,6 @@ import javax.servlet.ServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.Assert;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -38,6 +37,12 @@ import uk.ac.ebi.tsc.aap.client.security.util.SecurityUtil;
  * @author geoff
  */
 public abstract class AbstractReadFromRepositoryFilterBean extends GenericFilterBean {
+
+    /**
+     * As used in {@link uk.ac.ebi.tsc.aap.client.security.StatelessAuthenticationFilter} and 
+     * {@link uk.ac.ebi.tsc.aap.client.security.StatelessAuthenticationEntryPoint}.
+     */
+    public static final String ERROR_RESPONSE = "ERROR_RESPONSE";
 
     // "Token-authenticated" in messages provides some additional detail in logs.
     private static final String exceptionMsgAccountLocked = "Token-authenticated user %s has locked account";
@@ -95,14 +100,15 @@ public abstract class AbstractReadFromRepositoryFilterBean extends GenericFilter
                 errorResponse.setException(usernameNotFoundException.getClass().getCanonicalName());
             } finally {
                 if (errorResponse != null) {
-                    request.setAttribute("ERROR_RESPONSE", errorResponse);
+                    request.setAttribute(ERROR_RESPONSE, errorResponse);
                     /* Empty the authentication object from the filter chain.
                      * This should result in AnonymousAuthenticationFilter (probably further down
                      * the filter chain) creating an AnonymousAuthenticationToken, which will ensure
                      * that any access requiring authentication will be denied and the request
                      * will be sent to the authentication entry point (hopefully 
                      * StatelessAuthenticationEntryPoint). */
-                    SecurityContextHolder.getContext().setAuthentication(null);
+
+                    SecurityUtil.nullifyAuthentication();
                 }
             }
         } else {

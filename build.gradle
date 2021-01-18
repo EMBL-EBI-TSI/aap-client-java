@@ -2,6 +2,8 @@
 buildscript {
     ext {
         springBootVersion = '1.5.1.RELEASE'
+        // Spring Boot 1.5.1 uses mockito-core:1.10.19 (https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test/1.5.1.RELEASE)
+        powerMockVersion = '1.7.4';
     }
     repositories {
         mavenCentral()
@@ -44,6 +46,9 @@ subprojects {
         compile("com.fasterxml.jackson.core:jackson-annotations:2.8.11") // from 2.9, cannot use @JsonIgnore
         testCompile("com.google.guava:guava:24.1-jre")
         testCompile('org.springframework.boot:spring-boot-starter-test')
+        testCompile("org.powermock:powermock-core:$powerMockVersion")
+        testCompile("org.powermock:powermock-module-junit4:$powerMockVersion")
+        testCompile("org.powermock:powermock-api-mockito:$powerMockVersion")
         compile (group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.5')
     }
 

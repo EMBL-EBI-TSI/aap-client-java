@@ -31,7 +31,7 @@ public interface SecurityLogger {
                    Actor actionOn, String actionOnId, Map<String, Object> additionalData);
 
     /**
-     * Log the security event if an action is on themself.
+     * Log the security event if an action is on themself, or if there's no other party involved.
      * 
      * @param severity Action severity.
      * @param action Action, e.g. {@link Action#DELETE}.
