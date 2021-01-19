@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Data model for an AAP profile
+ * Data model for an AAP profile.
  */
 public class Profile {
 
@@ -36,6 +36,14 @@ public class Profile {
         return reference;
     }
 
+    /**
+     * Retrieve a potentially <b>partial</b> representation of the profile's {@link User}.
+     * <p>
+     * The assigned user may not be a full and complete representation, i.e. it may only have a
+     * valid {@link User#getUserReference()} and {@link User#isAccountNonLocked()} property.
+     * 
+     * @return Profile user or {@code null} if not assigned.
+     */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public User getUser() {
         return user;
@@ -83,6 +91,31 @@ public class Profile {
         return this.user != null ? this.user.getUserReference() : null;
     }
 
+    /**
+     * Retrieve the user profile user's {@code accountNonLocked} value.
+     * 
+     * @return {@code true} if account not locked, otherwise {@code false} if locked.
+     * @throws IllegalStateException If this method is called when not a User profile.
+     * @see #isUserProfile()
+     */
+    @JsonIgnore
+    public boolean retrieveUserAccountNonLocked() throws IllegalStateException {
+        if (!isUserProfile()) {
+            throw new IllegalStateException("Inappropriate internal system call made on a Domain Profile object");
+        }
+        return getUser().isAccountNonLocked(); 
+    }
+
+    /**
+     * Indicate if the profile is a user profile.
+     * 
+     * @return {@code true} if a user profile, otherwise {@code false}.
+     */
+    @JsonIgnore
+    public boolean isUserProfile() {
+        return (getUser() != null && getUser().getUserReference() != null);
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -117,6 +150,13 @@ public class Profile {
             return this;
         }
 
+        /**
+         * This will create and assign a {@link User} with only a {@link User#setUserReference(String)}
+         * assignment, i.e. the resultant {@code User} is unrepresentative of the actual user.
+         * 
+         * @param userReference User reference, or {@code null}.
+         * @return Builder.
+         */
         public Builder withUser(String userReference) {
             if (userReference != null) {
                 profile.user = User.builder().withReference(userReference).build();

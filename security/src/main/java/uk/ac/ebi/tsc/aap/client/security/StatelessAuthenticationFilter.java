@@ -43,11 +43,11 @@ public class StatelessAuthenticationFilter extends GenericFilterBean {
             throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         try {
-        Authentication authentication = authenticationService.getAuthentication(httpRequest);
-        if(authentication == null) throw new TokenNotSuppliedException("Token not supplied");
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        filterChain.doFilter(request, response);
-        }catch (TokenNotSuppliedException | InvalidJWTTokenException | TokenExpiredException e) {
+            Authentication authentication = authenticationService.getAuthentication(httpRequest);
+            if(authentication == null) throw new TokenNotSuppliedException("Token not supplied");
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            filterChain.doFilter(request, response);
+        } catch (TokenNotSuppliedException | InvalidJWTTokenException | TokenExpiredException e) {
             ErrorResponse errorResponse = new ErrorResponse();
             errorResponse.setError(e.getCode());
             errorResponse.setMessage(e.getMessage());

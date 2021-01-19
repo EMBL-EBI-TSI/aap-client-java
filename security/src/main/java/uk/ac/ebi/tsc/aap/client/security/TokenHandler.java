@@ -64,7 +64,16 @@ public class TokenHandler {
                 .build();
     }
 
-   public User parseUserFromToken(String token)  {
+   /**
+    * Extract the {@link User} from the JWT token.
+    * 
+    * @param token Token to parse.
+    * @return {@link User} with details populated by token properties.
+    * @throws InvalidJWTTokenException If any problems parsing token content.
+    * @throws TokenExpiredException If token has expired.
+    */
+   public User parseUserFromToken(String token) throws InvalidJWTTokenException,
+                                                       TokenExpiredException {
        try {
             Set<Domain> domainsSet = new HashSet<>();
             JwtClaims jwtClaims = jwtConsumer.processToClaims(token);

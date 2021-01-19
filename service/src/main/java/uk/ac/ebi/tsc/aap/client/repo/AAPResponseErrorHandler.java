@@ -9,6 +9,8 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
 import uk.ac.ebi.tsc.aap.client.exception.AAPException;
+import uk.ac.ebi.tsc.aap.client.exception.AAPLockedException;
+import uk.ac.ebi.tsc.aap.client.exception.AAPUsernameNotFoundException;
 import uk.ac.ebi.tsc.aap.client.exception.InvalidJWTTokenException;
 import uk.ac.ebi.tsc.aap.client.exception.TokenExpiredException;
 import uk.ac.ebi.tsc.aap.client.exception.TokenNotSuppliedException;
@@ -30,7 +32,7 @@ public class AAPResponseErrorHandler implements ResponseErrorHandler {
         LOGGER.error("Error code : {}", response.getStatusCode());
         String result = new BufferedReader(new InputStreamReader(response.getBody()))
                 .lines().collect(Collectors.joining("\n"));
-        LOGGER.error("Error response : {}", result);
+        LOGGER.error("Error response : {}",result);
         ErrorResponse errorResponse = null;
         if (result != null && !result.isEmpty()) {
             ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -59,6 +61,10 @@ public class AAPResponseErrorHandler implements ResponseErrorHandler {
                     throw new TokenExpiredException(message);
                 case "NO_TOKEN":
                     throw new TokenNotSuppliedException(message);
+                case AAPLockedException.CODE_ACCOUNT_LOCKED:
+                    throw new AAPLockedException(message);
+                case AAPUsernameNotFoundException.CODE_USERNAME_NOT_FOUND:
+                    throw new AAPUsernameNotFoundException(message);
                 default:
                     throw new InvalidJWTTokenException(message);
             }
