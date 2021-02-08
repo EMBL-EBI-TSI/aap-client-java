@@ -65,7 +65,7 @@ public class TokenHandler {
     }
 
    /**
-    * Extract the {@link User} from the JWT token.
+    * Extract the {@link User} from the JWT token and assign their account status as non-locked.
     * 
     * @param token Token to parse.
     * @return {@link User} with details populated by token properties.
@@ -83,7 +83,10 @@ public class TokenHandler {
             String fullName = jwtClaims.getStringClaimValue("name");
             List<String> domains = jwtClaims.getStringListClaimValue("domains");
             domains.forEach(name->domainsSet.add(new Domain(name,null,null)));
-            return new User(nickname, email, userReference, fullName, domainsSet);
+            final User user = new User(nickname, email, userReference, fullName, domainsSet);
+            // We have a valid token by this point, so consider the account non-locked.
+            user.setAccountNonLocked(true);
+            return user;
        } catch (InvalidJwtSignatureException e) {
            LOGGER.error("JWT Error : "+e.getMessage());
            throw new InvalidJWTTokenException("Supplied Token is not valid for this server");

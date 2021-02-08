@@ -17,6 +17,7 @@ import java.util.Date;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
@@ -52,6 +53,18 @@ public class TokenHandlerTest {
         User user = subject.parseUserFromToken(validToken);
 
         assertThat(user.getFullName()).isEqualTo("Alice Wonderland");
+    }
+
+    @Test public void
+    extracted_users_have_accounts_non_locked() throws Exception {
+        JwtClaims claims = minClaims();
+        claims.setClaim("name", "Alice Wonderland");
+        String validToken = JWTHelper.build(claims, signingKey, AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256);
+
+        User user = subject.parseUserFromToken(validToken);
+
+        assertTrue("A token-authenticated user should have an unlocked account setting",
+                    user.isAccountNonLocked());
     }
 
     @Test public void
