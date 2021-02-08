@@ -21,6 +21,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -395,8 +397,38 @@ public class DomainRepositoryRestTest {
 		this.domainsApi.verify();
 		
 		assertThat(users.size(), is(1));
-		
+		final User user = users.iterator().next();
+		assertFalse(user.isAccountNonLocked());
 	}
+
+    /**
+     * This, as in probably many of these tests, is serving coincidentally as a test of the
+     * {@code ObjectMapper}'s default forgiving nature, i.e.
+     * {@code DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES} is disabled!
+     */
+    @Test
+    public void can_get_list_of_users_for_domain_setting_account_non_locked(){
+        String domainReference = "domainReference";
+        String mockResponse = "[ {\n  \"userReference\" : \"57d94c6d-565c-46b8-aabe-49c9461fc707\",\n "
+                + " \"userName\" : \"946838e27f8831afd866ff6f66ad37f075626ae3\",\n  \"email\" :"
+                + " \"navispretheeba@gmail.com\",\n  \"mobile\" : null,\n  \"domains\" : null,\n  "
+                + " \"accountNonLocked\" : \"true\",\n"
+                + "\"links\" : [ {\n    \"rel\" : \"self\",\n   "
+                + " \"href\" : \"https://dev.api.aap.tsi.ebi.ac.uk/users/usr-57d94c6d-565c-46b8-aabe-49c9461fc707\"\n  } ]\n} ]";
+
+        String expectedUrl = String.format("/domains/dom-%s/users", domainReference);   
+
+        this.domainsApi.expect(requestTo(expectedUrl)).andExpect(method(HttpMethod.GET))
+                       .andRespond(withSuccess().body(mockResponse).contentType(MediaType.APPLICATION_JSON));
+
+        Collection<User> users = subject.getAllUsersFromDomain(domainReference, "token");
+
+        this.domainsApi.verify();
+
+        assertThat(users.size(), is(1));
+        final User user = users.iterator().next();
+        assertTrue(user.isAccountNonLocked());
+    }
 
 	@Test
 	public void can_get_list_of_managers_for_domain(){
