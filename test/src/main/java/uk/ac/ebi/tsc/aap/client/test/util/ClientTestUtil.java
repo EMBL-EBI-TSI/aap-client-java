@@ -7,7 +7,12 @@ import java.util.Set;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
 import uk.ac.ebi.tsc.aap.client.model.Domain;
+import uk.ac.ebi.tsc.aap.client.model.Profile;
 import uk.ac.ebi.tsc.aap.client.model.User;
 import uk.ac.ebi.tsc.aap.client.test.value.AapClientVersion;
 
@@ -25,6 +30,57 @@ public class ClientTestUtil {
         MESSAGE,
         PATH,
         EXCEPTION
+    }
+
+    /**
+     * Create a json representation of a client user {@link Profile}.
+     *  
+     * @param version
+     * @param profileReference
+     * @param userName
+     * @param email
+     * @param userReference
+     * @param fullName
+     * @param domains
+     * @param organization
+     * @param accountNonLocked
+     * @param attributes
+     * @return Json representation.
+     * @throws JsonProcessingException
+     */
+    public static String createClientUserProfileJson(final AapClientVersion version,
+                                                     final String profileReference,
+                                                     final String userName, final String email,
+                                                     final String userReference, final String fullName,
+                                                     final Set<Domain> domains, final Object organization,
+                                                     final boolean accountNonLocked,
+                                                     final Map<String, String> attributes)
+                                                     throws JsonProcessingException {
+        if (version == null) {
+            throw new IllegalArgumentException("Specify a version!");
+        }
+
+        Profile profile = null;
+        switch (version) {
+             case V1_0_6_SNAPSHOT :
+             case V1_0_7_SNAPSHOT :
+                 /* TODO : This won't help creating legacy json representations if Profile
+                  *        structure ever changes because we're using objects! */
+                 final User user = User.builder().withUsername(userName)
+                                                 .withEmail(email)
+                                                 .withReference(userReference)
+                                                 .withFullName(fullName)
+                                                 .withDomains(domains)
+                                                 .withAccountNonLocked(accountNonLocked)
+                                                 .build();
+                 profile = new Profile(profileReference, user, null, attributes);
+                 break;
+             default :
+                 throw new UnsupportedOperationException("Sorry, version " + version + " not handled yet!");
+        }
+        final ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(profile);
     }
 
     /**
