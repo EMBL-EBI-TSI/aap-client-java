@@ -1,0 +1,6 @@
+dependencies {
+    compile ('org.json:json')
+    compile ('org.springframework.security:spring-security-test')
+    compile project(':model')
+    compile project(':security')
+}

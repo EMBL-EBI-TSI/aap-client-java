@@ -2,3 +2,4 @@ include 'model'
 include 'service'
 include 'security'
 
+include 'test'
