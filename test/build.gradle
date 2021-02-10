@@ -1,5 +1,5 @@
 dependencies {
-    compile group: 'org.json', name: 'json', version: '20131018'
+    compile ('org.json:json')
     compile ('org.springframework.security:spring-security-test')
     compile project(':model')
     compile project(':security')
